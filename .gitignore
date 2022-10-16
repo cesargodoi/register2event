@@ -1,0 +1,12 @@
+# pastas
+errors/
+sessions/
+database/
+private/
+bkps/
+.idea/
+.vscode/
+static/docs/
+
+# arquivos
+*.pyc

@@ -1,0 +1,131 @@
+{{extend 'layout-print-ls.html'}}
+
+{{block header}}
+<h3>
+  {{if not late:}}
+  {{=T('payment by guest')}}&nbsp;&nbsp;&nbsp;
+  {{else:}}
+  {{=T('late payments by guests')}}&nbsp;&nbsp;&nbsp;
+  {{pass}}
+<small><b>{{=T('event')}}:</b> {{=event.activity.activity}} - {{=event.center.shortname}} {{=event.start_date.strftime('%b/%Y')}}</small></h3>
+{{end}}
+
+<br />
+<div class="row">
+  <div class="col-sm-12">
+    <table class="table table-condensed">
+      <thead>
+        <tr>
+          <th width="2%">#</th>
+          <th width="30%">{{=T('guest')}}</th>
+          <th width="2%"></th>
+          <th width="10%"></th>
+          <th width="2%"></th>
+          <th width="46%">{{=T('payment form')}}</th>
+          <th width="6%"class="text-right">{{=T('value')}} R$</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{
+          gsc_used = gsc_use if gsc_use else None
+          reg_pay, canc_pay = 0., 0.
+          for n, row in enumerate(rows):
+            type = [r[0] for r in row.payment_forms]
+            if not row.is_active:
+              tr_class = "text-danger"
+            else:
+              if row.credit:
+                tr_class = "text-success"
+              elif 'GSC' in type:
+                tr_class = "text-warning"
+              else:
+                tr_class = ""
+              pass
+            pass
+        }}
+        <tr data-toggle="modal" data-target="#confirm" onclick="info({{=row.id}})" class="{{=tr_class}}">
+          <th scope="row">{{=n+1}}</th>
+          <td>
+            {{=shortname_reports(row.name)}}
+            {{if row.aspect == 'YW':}}&nbsp;<span class="label label-success pull-right">{{=T('YW')}}</span>
+            {{elif row.aspect == 'PW':}}&nbsp;<span class="label label-primary pull-right">{{=T('PW')}}</span>{{pass}}
+          </td>
+          <td>{{if row.age:}} <span class="text-{{='primary' if row.age < 7 else 'default'}} pull-right">{{=row.age}}</span>{{pass}}</td>
+          <td style="font-size: 8pt;">
+            {{if not row.is_active:}}
+            <span class="label label-danger">{{=T('canceled')}}</span>
+            {{else:}}
+            {{if row.credit:}}
+            <span class="label label-success">{{=T('generated credit')}}</span>
+            {{elif 'GSC' in type:}}
+            <span class="label label-warning">{{=T('used credit')}}</span>
+            {{pass}}
+            {{pass}}
+          </td>
+          <td>
+            {{if row.multiple:}}
+            <span class="glyphicon glyphicon-link"></span>
+            {{pass}}
+          </td>
+          <td style="font-size: 7pt;" id="summary">
+            {{for pf in row.payment_forms:}}
+              {{if pf[0] in ['CSH', 'FRE']:}}
+              <em>[{{='%s $%1.2f' % (pf[0],pf[1])}}]</em>
+              {{else:}}
+              <em>[{{='%s $%1.2f %s %s' % (pf[0],pf[1],pf[2],pf[3])}}]</em>
+              {{pass}}
+            {{pass}}
+          </td>
+          <td class="text-right">
+            {{
+              reg_pay += float(row.amount)
+              if not row.is_active:
+                canc_pay += float(row.amount)
+                pass
+            }}
+            <strong>{{=row.amount}}</strong>
+          </td>
+        </tr>
+      {{pass}}
+      </tbody>
+    </table>
+
+    <table class="table table-condensed table-hover">
+      {{total = reg_pay - canc_pay}}
+
+      <tr>
+        <th width="25%" class="text-right text-success">{{if gsc_gen:}}{{=T('generated credit').upper()}}{{pass}}</th>
+        <th width="9%"class="text-right text-success">{{if gsc_gen:}}{{='%1.2f' % gsc_gen}}{{pass}}</th>
+        <th width="25%" class="text-right text-warning">{{if gsc_use:}}{{=T('used credit').upper()}}{{pass}}</th>
+        <th width="8%" class="text-right text-warning">{{if gsc_use:}}{{='%1.2f' % gsc_use}}{{pass}}</th>
+        <th colspan="2">
+      </tr>
+
+      <tr class="success" style="font-size:18px;">
+        <th colspan="5" width="92%" class="text-right">{{=T('total collected').upper()}}</th>
+        <th class="text-right">{{='%1.2f' % total}}</th>
+      </tr>
+    </table>
+
+  </div>
+</div>
+<!-- modal -->
+<div id="confirm" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"></div>
+
+<style type="text/css">
+div .table {
+  font-family: monospace;
+  font-size: 10pt;
+}
+#summary {
+  font-family: monospace;
+  font-size: 8pt;
+}
+</style>
+
+<script type="text/javascript">
+function info(regid){
+  ajax("{{=URL('reports', 'register_info')}}/"+regid, [], 'confirm');
+}
+function goBack() {history.go(-1)};
+</script>

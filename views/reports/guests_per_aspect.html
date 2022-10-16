@@ -1,0 +1,64 @@
+{{extend 'layout-print-ls.html'}}
+
+{{block header}}
+<h3>
+  {{=T('guests per aspect')}}&nbsp;&nbsp;&nbsp;
+  <small><b>{{=T('event')}}:</b> {{=event.activity.activity}} - {{=event.center.shortname}} {{=event.start_date.strftime('%b/%Y')}}</small>
+</h3>
+{{end}}
+
+<br />
+<div class="row">
+  <div class="col-sm-12">
+    <table class="table table-condensed">
+    {{aspect, n = '', 0
+      for r in rows:
+        if aspect != r.aspect:
+          n = 0
+          _aspect = T('no aspect') if not r.aspect else ASPECTS[r.aspect]}}
+        <tr>
+          <th colspan="5"><h4>{{=_aspect}}</h4></th>
+        </tr>
+        <tr>
+          <th width="5%">#</th>
+          <th width="35%">{{=T('guest')}}</th>
+          <th width="10%">{{=T('age')}}</th>
+          <th width="25%">{{=T('city')}}</th>
+          <th width="25%">{{=T('center')}}</th>
+        </tr>
+        <tr>
+          <td>{{=n + 1}}</td>
+          <td>{{=shortname(r.name)}}</td>
+          <td>{{=r.age}}</td>
+          <td>{{=r.city}}</td>
+          <td>{{=r.center}}</td>
+        </tr>
+        {{aspect = r['aspect']
+          n += 1}}
+        {{else:}}
+          <tr>
+            <td>{{=n + 1}}</td>
+            <td>{{=shortname(r.name)}}</td>
+            <td>{{=r.age}}</td>
+            <td>{{=r.city}}</td>
+            <td>{{=r.center}}</td>
+          </tr>
+          {{n += 1}}
+        {{pass}}
+    {{pass}}
+    </table>
+  </div>
+</div>
+<!-- modal -->
+<div id="confirm" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"></div>
+
+<style type="text/css">
+div .table {
+  font-family: monospace;
+  font-size: 9pt;
+}
+</style>
+
+<script type="text/javascript">
+function goBack() {history.go(-1)};
+</script>

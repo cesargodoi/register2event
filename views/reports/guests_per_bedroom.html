@@ -1,0 +1,61 @@
+{{extend 'layout-print-ls.html'}}
+
+{{block header}}
+<h3>
+  relação de quartos e staffs por hóspedes&nbsp;&nbsp;
+  <small><b>{{=T('event')}}:</b> {{=event.activity.activity}} - {{=event.center.shortname}} {{=event.start_date.strftime('%b/%Y')}}</small>
+</h3>
+{{end}}
+
+<br />
+<div class="row">
+  <div class="col-sm-12">
+    <table class="table table-condensed">
+      <thead>
+        <tr>
+          <th width="3%">#</th>
+          <th width="30%">{{=T('guest')}}</th>
+          <th width="23%">{{=T('bedroom')}} - {{=T('building')}}</th>
+          <th width="44%">{{=T('staff')}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{for n, r in enumerate(rows):}}
+        <tr>
+          <td>{{=n+1}}</td>
+          <td>{{=shortname_reports(r.name)}}</td>
+          <td>
+            {{if r.bedroom_details == 'not_lodge':}}
+              <b>[ NÃO ALOJADO(A) ]</b>
+            {{elif r.bedroom_details == 'out_of_center':}}
+              {{if r.lodge == 'HSE':}}
+                <i>hospedado em CASA</i>
+              {{elif r.lodge == 'HTL':}}
+                <i>hospedado em HOTEL</i>
+              {{pass}}
+            {{else:}}
+              {{=r.bedroom_details[0][:4]}}.{{='C' if r.bedroom_details[1] == 'top' else 'B'}} - {{=r.bedroom_details[2]}}
+            {{pass}}
+          </td>
+          {{_staff = '' if not r.staff else STAFFS[r.staff]}}
+          <td>{{=_staff}}{{if r.description:}} | {{=r.description}}{{pass}}</td>
+        </tr>
+        {{pass}}
+      </tbody>
+    </table>
+
+  </div>
+</div>
+<!-- modal -->
+<div id="confirm" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"></div>
+
+<style type="text/css">
+div .table {
+  font-family: monospace;
+  font-size: 11pt;
+}
+</style>
+
+<script type="text/javascript">
+function goBack() {history.go(-1)};
+</script>

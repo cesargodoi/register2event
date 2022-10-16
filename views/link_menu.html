@@ -1,0 +1,26 @@
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{=T('management')}}</span></a>
+  <ul class="dropdown-menu">
+    <li><a href="{{=URL('events', 'list')}}"><span class="glyphicon glyphicon-calendar"></span> {{=T('events')}}</a></li>
+    <li><a href="{{=URL('guest', 'list')}}"><span class="glyphicon glyphicon-user"></span> {{=T('guests')}}</a></li>
+    <li><a href="{{=URL('building', 'list_buildings')}}"><span class="glyphicon glyphicon-home"></span> {{=T('accomodations')}}</a></li>
+    <li class="divider"></li>
+    <li><a href="{{=URL('reports', 'locate_payment_form')}}"><span class="glyphicon glyphicon-screenshot"></span> {{=T('locate payment form')}}</a></li>
+    {{if auth.has_membership('root'):}}
+    <li class="divider"></li>
+    <li><a href="{{=URL('default', 'manage_center')}}" style="color:#888;"><span class="glyphicon glyphicon-pencil"></span> {{=T('centers')}}</a></li>
+    <li><a href="{{=URL('default', 'manage_activities')}}" style="color:#888;"><span class="glyphicon glyphicon-pencil"></span> {{=T('activities')}}</a></li>
+    <li><a href="{{=URL('default', 'manage_bank_flag')}}" style="color:#888;"><span class="glyphicon glyphicon-pencil"></span> {{=T('bank and flags')}}</a></li>
+    <li class="divider"></li>
+    <li><a href="{{=URL('mapping', 'new_mapping')}}" style="color:red;"><span class="glyphicon glyphicon-pencil"></span> {{=T('new accommodations mapping')}}</a></li>
+    <li><a href="{{=URL('default', 'adj_bedroom_alt')}}" style="color:red;"><span class="glyphicon glyphicon-pencil"></span> {{=T('adjust alternative bedrooms')}}</a></li>
+    <li><a href="{{=URL('default', 'kill_them_all')}}" style="color:red;"><span class="glyphicon glyphicon-pencil"></span> {{=T('delete record')}}</a></li>
+    <li class="divider"></li>
+    <li><a class="btn-block" href="{{=URL('admin','default','index')}}" target="_blank"><span class="glyphicon glyphicon-cog"></span> {{=T("admin")}}</a></li>
+    <li><a class="btn-block" href="{{=URL('default','change_center')}}" target="_self"><span class="glyphicon glyphicon-globe"></span> {{=T("change center")}}</a></li>
+    {{elif auth.has_membership('admin') and auth.user.center == 2:}}
+    <li class="divider"></li>
+    <li><a class="btn-block" href="{{=URL('default','change_center')}}" target="_self"><span class="glyphicon glyphicon-globe"></span> {{=T("change center")}}</a></li>
+    {{pass}}
+  </ul>
+</li>

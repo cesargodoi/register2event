@@ -1,0 +1,116 @@
+{{extend 'layout.html'}}
+
+{{block header}}
+{{
+  if gender=='M':
+    gender_txt = T('masculine')
+    gender_color = 'primary'
+  elif gender=='F':
+    gender_txt = T('feminine')
+    gender_color = 'warning'
+  else:
+    gender_txt = T('mixed')
+    gender_color = 'info'
+  pass
+}}
+<h2>
+  {{=building_repr % rows[0]['builid']}}
+  <small>{{=T('list of bedrooms')}}
+    <span class="label label-{{=gender_color}}">{{=gender_txt}}</span>
+  </small>
+</h2>
+{{end}}
+{{block link_menu}}{{end}}
+
+{{block control_menu}}
+  <div class="btn-group" role="group">
+    {{if auth.has_membership('root') or auth.has_membership('admin'):}}
+    <button type="button"
+            class="btn btn-primary"
+            onclick="window.open('{{=URL('new_bedroom', vars={'builid':rows[0].builid, 'gender':gender})}}', '_self')">
+      <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+    </button>
+    {{pass}}
+    <button type="button"
+            class="btn btn-info"
+            onclick="window.open('{{=URL('building', 'show_building', vars={'builid':rows[0].builid})}}', '_self')">
+      <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+    </button>
+  </div>
+{{end}}
+
+<div class="row">
+  <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+    {{
+      floor, floor_txt = 1000, ''
+      for n, row in enumerate(rows):
+    }}
+    {{
+      if row.floor_room != floor:
+        floor = row.floor_room
+        if floor < 0:
+          floor_txt = 'subsolo %s' % abs(floor)
+        elif floor == 0:
+          floor_txt = 'terreo'
+        else:
+          floor_txt = '%so. andar' % floor
+        pass
+    }}
+    <div class="panel panel-default">
+      <div class="panel-heading" role="tab" id="heading_{{=n}}">
+        <h4 class="panel-title">
+          <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse_{{=n}}" aria-expanded="true" aria-controls="collapseOne">
+            <strong>{{=floor_txt}}</strong>
+          </a>
+        </h4>
+      </div>
+      <div id="collapse_{{=n}}" class="panel-collapse collapse {{='in' if n==0 else ''}}" role="tabpanel" aria-labelledby="headingOne">
+        <div class="panel-body">
+          <div class="row">
+            {{
+              for r in rows:
+                if r.floor_room == floor:
+            }}
+            {{alert = 'info' if r.is_active else 'danger'}}
+            <div class="col-sm-2 alert alert-{{=alert}}"
+                 onclick="window.open('{{=URL('show_bedroom', vars={'bedroomid':r.id})}}', '_self')">
+                <h4>{{=r.bedroom}}</h4>
+                {{beds = int(r.beds) - int(r.top_bunks)}}
+                {{
+                  if r.top_bunks:
+                    for i in range(int(r.beds)-beds):
+                }}
+                <img src="{{=URL('static', 'images/bedicons', args='bed_YY.png')}}" draggable="true">
+                {{
+                    pass
+                    for i in range(beds):
+                }}
+                <img src="{{=URL('static', 'images/bedicons', args='bed_Y.png')}}" draggable="true">
+                {{
+                    pass
+                  else:
+                    for i in range(beds):
+                }}
+                <img src="{{=URL('static', 'images/bedicons', args='bed_Y.png')}}" draggable="true">
+                {{
+                    pass
+                  pass
+                }}
+
+            </div>
+              {{pass}}
+            {{pass}}
+          </div>
+        </div>
+      </div>
+    </div>
+    {{pass}}
+    {{pass}}
+
+  </div>
+</div>
+
+<script type="text/javascript">
+function goBack() {history.go(-1)};
+
+</script>

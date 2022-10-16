@@ -1,0 +1,142 @@
+{{extend 'layout.html'}}
+
+{{block header}}
+  <h3><strong>{{=building.building}}</strong>&nbsp;&nbsp;
+    <small>{{='%s(%s)' %(event.activity.activity, event.center.shortname)}}</small>&nbsp;&nbsp;
+  </h3>
+{{end}}
+
+{{block control_menu}}
+  <ol class="breadcrumb">
+    <li><a href="{{=URL('events', 'show', vars={'evenid': event.id, 'admin_view':'T'})}}">{{=T('event')}}</a></li>
+    <li><a href="{{=URL('accommodations', 'buildings_on_event', vars={'evenid': event.id})}}">{{=T('buildings')}}</a></li>
+    <li class="active">{{=T('building')}}</li>
+  </ol>
+{{end}}
+
+{{block link_menu}}
+{{end}}
+
+<div class="row">
+  <div class="col-sm-6">
+
+    {{if building.male[0]>0:}}
+    <div class="bs-callout bs-callout-info"
+         onclick="window.open('{{=URL('accommodations', 'bedrooms_by_gender_on_event', vars={'builid':building.id, 'gender': 'M', 'evenid':event.id})}}', '_self')">
+      <h4>Alojamentos Masculinos</h4>
+      <table class="table table-condensed">
+        <tr>
+          <th width="17%">{{=T('bedrooms')}}</th>
+          <th width="33%">{{=T('beds')}}</th>
+          <th width="33%">{{=T('top bunks')}}</th>
+          <th width="17%">{{=T('vacancies')}}</th>
+        </tr>
+        <tr style="font-weight: bold;">
+          <td><span class="label label-default">{{=building.male[0]}}</span></td>
+          <td>
+            <span class="label label-primary">{{=building.male[1]}}</span>
+            {{if building.male[2]:}}
+              - <span class="label label-danger">{{=building.male[2]}}</span>
+              = <span class="label label-success">{{=building.male[3]}}</span>
+            {{pass}}
+          </td>
+          <td>
+            <span class="label label-primary">{{=building.male[4]}}</span>
+            {{if building.male[5]:}}
+              - <span class="label label-danger">{{=building.male[5]}}</span>
+              = <span class="label label-success">{{=building.male[6]}}</span>
+            {{pass}}
+          </td>
+          <td><span class="label label-success" style="font-size:11pt;">{{=(building.male[3] + building.male[6])}}</span></td>
+        </tr>
+      </table>
+    </div>
+    {{pass}}
+
+    {{if building.female[0]>0:}}
+    <div class="bs-callout bs-callout-warning"
+         onclick="window.open('{{=URL('accommodations', 'bedrooms_by_gender_on_event', vars={'builid':building.id, 'gender': 'F', 'evenid':event.id})}}', '_self')">
+      <h4>Alojamentos Femininos</h4>
+      <table class="table table-condensed">
+        <tr>
+          <th width="17%">{{=T('bedrooms')}}</th>
+          <th width="33%">{{=T('beds')}}</th>
+          <th width="33%">{{=T('top bunks')}}</th>
+          <th width="17%">{{=T('vacancies')}}</th>
+        </tr>
+        <tr style="font-weight: bold;">
+          <td><span class="label label-default">{{=building.female[0]}}</span></td>
+          <td>
+            <span class="label label-primary">{{=building.female[1]}}</span>
+            {{if building.female[2]:}}
+              - <span class="label label-danger">{{=building.female[2]}}</span>
+              = <span class="label label-success">{{=building.female[3]}}</span>
+            {{pass}}
+          </td>
+          <td>
+            <span class="label label-primary">{{=building.female[4]}}</span>
+            {{if building.female[5]:}}
+              - <span class="label label-danger">{{=building.female[5]}}</span>
+              = <span class="label label-success">{{=building.female[6]}}</span>
+            {{pass}}
+          </td>
+          <td><span class="label label-success" style="font-size:11pt;">{{=(building.female[3] + building.female[6])}}</span></td>
+        </tr>
+      </table>
+    </div>
+    {{pass}}
+
+    {{if building.mixed[0]>0:}}
+    <div class="bs-callout bs-callout-default"
+         onclick="window.open('{{=URL('accommodations', 'bedrooms_by_gender_on_event', vars={'builid':building.id, 'gender': 'X', 'evenid':event.id})}}', '_self')">
+      <h4>Alojamentos Mistos</h4>
+      <table class="table table-condensed">
+        <tr>
+          <th width="17%">{{=T('bedrooms')}}</th>
+          <th width="33%">{{=T('beds')}}</th>
+          <th width="33%">{{=T('top bunks')}}</th>
+          <th width="17%">{{=T('vacancies')}}</th>
+        </tr>
+        <tr style="font-weight: bold;">
+          <td><span class="label label-default">{{=building.mixed[0]}}</span></td>
+          <td>
+            <span class="label label-primary">{{=building.mixed[1]}}</span>
+            {{if building.mixed[2]:}}
+              - <span class="label label-danger">{{=building.mixed[2]}}</span>
+              = <span class="label label-success">{{=building.mixed[3]}}</span>
+            {{pass}}
+          </td>
+          <td>
+            <span class="label label-primary">{{=building.mixed[4]}}</span>
+            {{if building.mixed[5]:}}
+              - <span class="label label-danger">{{=building.mixed[5]}}</span>
+              = <span class="label label-success">{{=building.mixed[6]}}</span>
+            {{pass}}
+          </td>
+          <td><span class="label label-success" style="font-size:11pt;">{{=(building.mixed[3] + building.mixed[6])}}</span></td>
+        </tr>
+      </table>
+    </div>
+    {{pass}}
+
+  </div>
+  {{if session.mapp.unallocateds:}}
+  {{include 'guests_unallocated.html'}}
+  {{pass}}
+</div>
+
+<div id="confirm" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"></div>
+
+<style type="text/css">
+</style>
+
+<script type="text/javascript">
+function addToBedroom(gid) {
+  var ev = {{=event.id}};
+  if (confirm("{{=T('Are you sure')}}?")) {
+    ajax(`{{=URL('accommodations', 'choose_a_bedroom')}}?evenid=${ev}&guesid=${gid}`, [], ':eval');
+  }
+}
+
+function goBack() {history.go(-1)};
+</script>

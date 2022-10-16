@@ -1,0 +1,32 @@
+{{extend 'layout.html'}}
+
+{{block header}}
+  <h3>{{=T('building')}} <small>{{=T('edit')}}</small></h3>
+{{end}}
+
+{{block control_menu}}
+  <div class="btn-group" role="group">
+    {{if auth.has_membership('root') or auth.has_membership('admin'):}}
+    <button type="button" class="btn btn-danger" onclick="delBuilding({{=builid}});">
+      <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+    </button>
+    {{pass}}
+    <button type="button" class="btn btn-info" onclick="goBack()">
+      <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+    </button>
+  </div>
+{{end}}
+
+<div class="row">
+  {{=form}}
+</div>
+
+<script type="text/javascript">
+function goBack() {history.go(-1)};
+
+function delBuilding(builid){
+  if (confirm("{{=T('Are you sure')}}?")) {
+     ajax("{{=URL('accommodations', 'delete_building')}}?builid="+builid, [], ':eval');
+    }
+};
+</script>

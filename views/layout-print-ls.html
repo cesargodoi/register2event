@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{=response.title or request.application}}</title>
+    <link rel="stylesheet" href="{{=URL('static','css/bootstrap.min.css')}}"/>
+    {{include 'web2py_ajax.html'}}
+
+    <style type="text/css">
+    body {
+      width: 900px;
+      margin: 0 auto;
+      font-size: 8pt;
+      font-family: arial, helvetica;
+    }
+    </style>
+    {{block head}}{{end}}
+  </head>
+  {{if auth.user:}}
+  <body>
+    <div style="border-bottom: solid 1px #000">
+      <div class="img-rounded" style="width:60px;padding:10px 10px 0 0; position:relative;float:left;">
+        <img width=50 src="{{=URL('static', 'images', args='rca.png')}}">
+      </div>
+      <div style="position:relative;float:left;">
+        <h3>Lectorium Rosicrucianum</h3>
+        <div style="position:relative;top:-13px;font-size:11pt;">Escola Espiritual da Rosacruz Áurea</div>
+      </div>
+      <div class="text-right" style="position:relative;float:right; margin: 10px 0 5px;">
+        <b>{{=T('user')}}:</b>&nbsp;&nbsp;&nbsp;<i>{{=auth.user.first_name}} {{=auth.user.last_name}}</i>&nbsp;&nbsp;&nbsp;<i>({{=auth.user.email}})</i><br />
+        <b>{{=T('center')}}:</b>&nbsp;&nbsp;&nbsp;
+        {{
+          center = '%(shortname)s - %(city)s (%(country)s)' % db(Center.id==auth.user.center).select().first()
+        }}
+        <i>{{=center}}</i></br>
+        <time datetime="{{=request.now}}" pubdate>{{=request.now.strftime('%d/%m/%y - %Hh%M')}} </time>
+      </div>
+      <div class="clearfix"></div>
+
+      {{block header}}{{end}}
+
+    </div>
+
+    {{include}}
+
+    {{block footer}}
+    <hr />
+    <center>
+      &copy; register2event 2017
+    </center>
+    {{include 'ctrls.html'}}
+    {{end}}
+
+    {{block page_js}}{{end page_js}}
+
+  </body>
+  {{else:}}
+  {{redirect(URL('default','index'))}}
+  {{pass}}
+  <script src="{{=URL('static','js/bootstrap.min.js')}}"></script>
+  <script src="{{=URL('static','js/web2py-bootstrap3.js')}}"></script>
+</html>

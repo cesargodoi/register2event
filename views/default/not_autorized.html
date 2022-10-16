@@ -1,0 +1,16 @@
+{{extend 'layout.html'}}
+
+{{block header}}
+  <h2 class="text-danger center">você não tem autorização para acessar esta página</h2>
+{{end}}
+
+{{block content}}
+<div class="row center">
+  <button type="button"
+          class="btn btn-danger btn-lg"
+          onclick="window.open('{{=home}}','_self');">
+    <span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span>
+    sair
+  </button>
+</div>
+{{end}}

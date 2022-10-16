@@ -1,0 +1,24 @@
+{{extend 'layout.html'}}
+
+{{block header}}
+    <header class="container-fluid jumbotron">
+      <div class="text-center">
+        <h1>dbadmin
+          <small>
+            {{ 
+                if len(request.args) == 1:
+                    =str(request.args[0])
+                elif len(request.args) == 2:
+                    =str(request.args[-1])+' | '+str(request.args[-2])
+                elif len(request.args) == 3:
+                    =str(request.args[-2])+' | '+str(request.args[-3])
+                pass
+            }}
+          </small>
+        </h1>
+      </div>
+    </header>
+
+{{end}}
+
+{{=form}}

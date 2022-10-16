@@ -1,0 +1,32 @@
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{=T('reports')}}</a>
+  <ul class="dropdown-menu">
+    <li class="dropdown-header">{{=T('basics')}}</li>
+    <li>
+      <a href="{{=URL('reports', 'guests_per_bedroom', vars={'evenid':event.id})}}" target="_blank">{{=T('guests per bedroom')}}</a>
+    </li>
+    <li>
+      <a href="{{=URL('reports', 'map_of_bedrooms', vars={'evenid':event.id})}}" target="_blank">{{=T('map of bedrooms')}}</a>
+    </li>
+    <li>
+      <a href="{{=URL('reports', 'guests_per_staff', vars={'evenid':event.id})}}" target="_blank">{{=T('guests per staff')}}</a>
+    </li>
+    <li>
+      <a href="{{=URL('reports', 'guests_per_meals', vars={'evenid':event.id})}}" target="_blank">{{=T('guests per meals')}}</a>
+    </li>
+    <li>
+      <a href="{{=URL('reports', 'guests_per_aspect', vars={'evenid':event.id})}}" target="_blank">{{=T('guests per aspect')}}</a>
+    </li>
+    <li class="divider"></li>
+    <li>
+      <a href="{{=URL('reports', 'pupils_guests', vars={'evenid':event.id})}}" target="_blank">{{=T("pupil's guests")}}</a>
+    </li>
+    <li class="divider"></li>
+    <li>
+      <a href="{{=URL('reports', 'total_by_centers', vars={'evenid':event.id})}}" target="_blank">{{=T('total by centers')}}</a>
+    </li>
+    <li>
+      <a href="{{=URL('reports', 'summary_to_print', vars={'evenid':event.id})}}" target="_blank">{{=T('summary to print')}}</a>
+    </li>
+  </ul>
+</li>

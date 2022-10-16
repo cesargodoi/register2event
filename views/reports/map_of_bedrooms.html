@@ -1,0 +1,52 @@
+{{extend 'layout-print-ls.html'}}
+
+{{block header}}
+<h3>
+  mapa dos quartos com seus hóspedes&nbsp;&nbsp;
+  <small><b>{{=T('event')}}:</b> {{=event.activity.activity}} - {{=event.center.shortname}} {{=event.start_date.strftime('%b/%Y')}}</small>
+</h3>
+{{end}}
+
+<br />
+<div class="row">
+  <div class="col-sm-12">
+    <table class="table">
+    {{_bedroom = 0}}
+    {{for r in rows:}}
+      {{if r.bedroom:}}
+        {{if r.bedroom != _bedroom:}}
+          <tr class="active">
+            <td colspan="3" style="font-size: 16pt;"><strong>{{=r.bedroom_details[2]}} - {{=r.bedroom_details[0]}}</td>
+          </tr>
+          <tr>
+            <td>{{=shortname_reports(r.name)}}</td>
+            <td>cama de {{='cima' if r.bedroom_details[1] == 'top' else 'baixo'}}</td>
+            {{_staff = '' if not r.staff else STAFFS[r.staff]}}
+            <td><em>{{=_staff}}{{if r.description:}} | {{=r.description}}{{pass}}</em></td>
+            {{_bedroom = r.bedroom}}
+          </tr>
+        {{else:}}
+          <tr>
+            <td>{{=shortname(r.name)}}</td>
+            <td>cama de {{='cima' if r.bedroom_details[1] == 'top' else 'baixo'}}</td>
+            {{_staff = '' if not r.staff else STAFFS[r.staff]}}
+            <td><em>{{=_staff}}{{if r.description:}} | {{=r.description}}{{pass}}</em></td>
+          </tr>
+        {{pass}}
+      {{pass}}
+    {{pass}}
+    </table>
+
+</div>
+<!-- modal -->
+<div id="confirm" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"></div>
+
+<style type="text/css">
+div .table {
+  font-size: 10pt;
+}
+</style>
+
+<script type="text/javascript">
+function goBack() {history.go(-1)};
+</script>

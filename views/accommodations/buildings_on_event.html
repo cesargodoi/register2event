@@ -1,0 +1,117 @@
+{{extend 'layout.html'}}
+
+{{block header}}
+<h3><strong>{{=T('list of buildings')}}</strong>&nbsp;&nbsp;
+  <small>{{='%s(%s)' %(event.activity.activity, event.center.shortname)}}</small>&nbsp;&nbsp;
+</h3>
+{{end}}
+
+{{block control_menu}}
+  <ol class="breadcrumb">
+    <li><a href="{{=URL('events', 'show', vars={'evenid': event.id, 'admin_view':'T'})}}">{{=T('event')}}</a></li>
+    <li class="active">{{=T('buildings')}}</li>
+  </ol>
+  {{if session.mapp.difference and event.status == 'OPN':}}
+  <span class="pull-right">
+    {{=T('there is a difference between bedrooms and the mapping')}}
+    <strong><a href="#" onclick="updateMapping({{=event.id}});">{{=T('fix it')}}?</a></strong>
+  </span>
+  {{pass}}
+{{end}}
+
+<!-- define the paginator -->
+{{if rows:}}
+<div class="row">
+  <div class="col-sm-6">
+    <table class="table table-hover table-condensed">
+      {{for row in rows:}}
+      <tr id="{{=row.id}}"
+          onclick="window.open('{{=URL('building_on_event', vars={'builid':row.id, 'evenid':event.id})}}', '_self')">
+        {{onOff = 'primary' if row.is_active else 'warning'}}
+        <td width="30px" class="bg-{{='primary' if row.is_active else 'warning'}}">
+          <center>
+            <span class="glyphicon glyphicon-home"></span>
+          </center>
+        </td>
+        <td>
+          <h4>{{=row.building}}<small>{{=row.description}}</small> </h4>
+          <div style="font-size:10pt;">
+            <strong>{{=T('place')}}:</strong> <em>{{=center_repr % row.center}}</em><br>
+            <table class="table table-condensed">
+              <tr>
+                <th></th><th>vagas</th><th>em uso</th><th>disponíveis</th>
+              </tr>
+              {{if row.male[0]:}}
+                <tr>
+                  <th>
+                    {{=T('male')}}
+                  </th>
+                  <td><span class="label label-primary">{{=row.male[0]}}</span></td>
+                  {{if row.male[1] != 0:}}
+                    <td><span class="label label-danger">{{=row.male[1]}}</span></td>
+                    <td><span class="label label-success">{{=row.male[2]}}</span></td>
+                  {{else:}}
+                    <td></td><td></td>
+                  {{pass}}&nbsp;&nbsp;&nbsp;
+                </tr>
+              {{pass}}
+
+              {{if row.female[0]:}}
+                <tr>
+                  <th>
+                    {{=T('female')}}
+                  </th>
+                  <td><span class="label label-primary">{{=row.female[0]}}</span></td>
+                  {{if row.female[1] != 0:}}
+                    <td><span class="label label-danger">{{=row.female[1]}}</span></td>
+                    <td><span class="label label-success">{{=row.female[2]}}</span></td>
+                  {{else:}}
+                    <td></td><td></td>
+                  {{pass}}&nbsp;&nbsp;&nbsp;
+                </tr>
+              {{pass}}
+
+              {{if row.mixed[0]:}}
+                <tr>
+                  <th>
+                    {{=T('mixed')}}
+                  </th>
+                  <td><span class="label label-primary">{{=row.mixed[0]}}</span></td>
+                  {{if row.mixed[1] != 0:}}
+                    <td><span class="label label-danger">{{=row.mixed[1]}}</span></td>
+                    <td><span class="label label-success">{{=row.mixed[2]}}</span></td>
+                  {{else:}}
+                    <td></td><td></td>
+                  {{pass}}&nbsp;&nbsp;&nbsp;
+                </tr>
+              {{pass}}
+
+            </table>
+          </div>
+        </td>
+      </tr>
+      {{pass}}
+    </table>
+  </div>
+  {{if session.mapp.unallocateds:}}
+  {{include 'guests_unallocated.html'}}
+  {{pass}}
+</div>
+{{pass}}
+
+<script type="text/javascript">
+function addToBedroom(gid) {
+  var ev = {{=event.id}};
+  if (confirm("{{=T('Are you sure')}}?")) {
+    ajax(`{{=URL('accommodations', 'choose_a_bedroom')}}?evenid=${ev}&guesid=${gid}`, [], ':eval');
+  }
+}
+
+function updateMapping(ev) {
+  if (confirm("{{=T('Are you sure')}}?")) {
+    ajax(`{{=URL('mapping', 'ajax_update_mapping')}}?evenid=${ev}`, [], ':eval');
+  }
+}
+
+function goBack() {history.go(-1)};
+</script>

@@ -1,0 +1,341 @@
+{{extend 'layout-print-ls.html'}}
+
+{{block header}}
+{{if not late:
+    title = T('total cash balance') if total_cash_balance else T('daily cash balance')
+  else:
+    title = T('total cash balance - late') if (total_cash_balance and late) else T('daily cash balance - late')
+  pass}}
+<h3>
+  {{=title}}&nbsp;&nbsp;
+<small>
+  {{if not total_cash_balance:}}
+  <b>{{=T('from')}}:</b> {{=dt2.strftime('%d/%m')}} <b>{{=T('to')}}:</b> {{=dt1.strftime('%d/%m')}}&nbsp;&nbsp;
+  {{pass}}
+  <b>{{=T('event')}}:</b> {{=event.activity.activity}} - {{=event.center.shortname}} {{=event.start_date.strftime('%b/%Y')}}
+</small>
+</h3>
+{{end}}
+{{collected = normal + usedcredit
+  centers_credit = gencredit - usedcredit
+  total_collected = collected + centers_credit
+  total_transfer = total_collected - centers_credit}}
+<div class="row">
+  <div id="resume" class="col-sm-12">
+    <h3>{{=T('overview')}}</h3>
+    {{if gencredit or normal:}}
+    <table class="table table-condensed table-hover">
+      <thead>
+        <tr>
+          <th width="75%">{{=T('payment type')}}</th>
+          <th class="text-right">total R$</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{if gencredit:}}
+        <tr class="success text-success">
+          <th scope="row">{{=T('generated credit').upper()}}</th><td class="text-right">{{=gencredit}}</td>
+        </tr>
+        {{pass}}
+        {{if usedcredit:}}
+        <tr class="warning text-warning">
+          <th scope="row">{{=T('used credit').upper()}}</th><td class="text-right">{{=usedcredit}}</td>
+        </tr>
+        {{pass}}
+        {{if csh:}}
+        <tr><th scope="row">{{=T('cash').upper()}}</th><td class="text-right">{{=csh}}</td></tr>
+        {{pass}}{{if chk:}}
+        <tr><th scope="row">{{=T('check').upper()}}</th><td class="text-right">{{=chk}}</td></tr>
+        {{pass}}{{if pre:}}
+        <tr><th scope="row">{{=T('pre check').upper()}}</th><td class="text-right">{{=pre}}</td></tr>
+        {{pass}}{{if dbt:}}
+        <tr><th scope="row">{{=T('debit').upper()}}</th><td class="text-right">{{=dbt}}</td></tr>
+        {{pass}}{{if cdt:}}
+        <tr><th scope="row">{{=T('credit').upper()}}</th><td class="text-right">{{=cdt}}</td></tr>
+        {{pass}}{{if dpt:}}
+        <tr><th scope="row">{{=T('deposit').upper()}}</th><td class="text-right">{{=dpt}}</td></tr>
+        {{pass}}{{if trf:}}
+        <tr><th scope="row">{{=T('transfer').upper()}}</th><td class="text-right">{{=trf}}</td></tr>
+        {{pass}}
+        {{if canceled:}}
+        <tr class="text-danger">
+          <th scope="row">{{=T('canceled').upper()}}</th><td class="text-right">{{=canceled}}</td>
+        </tr>
+        {{pass}}
+        <tr>
+          <th width="85%" class="text-right">{{=T('total collected').upper()}}</th>
+          <th class="text-right">{{=total_collected}}</th>
+        </tr>
+        {{if centers_credit:}}
+        <tr class="text-{{='primary' if centers_credit > 0 else 'danger'}}">
+          <th width="85%" class="text-right">{{=T("center's credit").upper()}}</th>
+          <th class="text-right">{{=centers_credit}}</th>
+        </tr>
+        {{pass}}
+        <tr class="success" style="font-size:12pt;">
+          <th width="85%" class="text-right">{{=T('send to event').upper()}}</th>
+          <th class="text-right">{{=total_transfer}}</th>
+        </tr>
+      </tbody>
+    </table>
+    {{pass}}
+  </div>
+  <div id="detail" class="col-sm-12">
+    <h3>{{=T('detailed report')}}</h3>
+
+    {{if gencredit:}}
+    <table class="table table-condensed table-hover">
+      <thead>
+        <tr class="success text-success">
+          <th colspan="7"><h4>{{=T('generated credit').upper()}}</h4></th>
+        </tr>
+        <tr>
+          <th>guest</th>
+          <th>type</th>
+          <th>bank/flag</th>
+          <th>control</th>
+          <th>user</th>
+          <th>on</th>
+          <th class="text-right" width="60px">value $</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{if gencredit:}}
+          {{for item in GENCRED:}}
+          <tr>
+            <td>{{=item.guest_name}} {{if item.cancel:}}<span class="label label-info pull-right">CANCEL</span>{{pass}}</td>
+            <td>{{=item.pay_type_str.upper()}}</td>
+            <td>{{=item.bank_flag_str if item.bank_flag else ''}}</td>
+            <td>{{=item.num_ctrl if item.num_ctrl else ''}}</td>
+            <td>{{=item.created_by.first_name}}</td>
+            <td>{{=item.created_on}}</td><td class="text-right">{{=item.amount}}</td>
+          </tr>
+          {{pass}}
+        {{pass}}
+        <tr class="success text-success"><th colspan="6" class="text-right">TOTAL</th><th class="text-right">{{=gencredit}}</th></tr>
+      </tbody>
+    </table>
+    {{pass}}
+
+    {{if usedcredit:}}
+    <table class="table table-condensed table-hover">
+      <thead>
+        <tr class="warning text-warning">
+          <th colspan="5"><h4>{{=T('used credit').upper()}}</h4></th>
+        </tr>
+        <tr>
+        </tr>
+        <th>type</th><th>guest</th><th>user</th><th>on</th><th class="text-right" width="60px">value $</th>
+      </thead>
+      <tbody>
+          {{for item in GSC:}}
+          <tr>
+            <td>{{=item.pay_type_str.upper()}}</td><td>{{=item.guest_name}}</td>
+            <td>{{=item.created_by.first_name}}</td><td>{{=item.created_on}}</td><td class="text-right">{{=item.amount}}</td>
+          </tr>
+          {{pass}}
+        <tr class="warning text-warning"><th colspan="4" class="text-right">TOTAL</th><th class="text-right">{{=usedcredit}}</th></tr>
+      </tbody>
+    </table>
+    {{pass}}
+
+    {{if CSH:}}
+    <table class="table table-condensed table-hover">
+      <thead>
+        <tr>
+          <th colspan="4"><h4>{{=T('cash').upper()}}</h4></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><th>{{=len(CSH)}} lançamentos</th><th class="text-right">TOTAL</th><th class="text-right" width="60px">{{=csh}}</th></tr>
+      </tbody>
+    </table>
+    {{pass}}
+
+    {{if CHK:}}
+    <table class="table table-condensed table-hover">
+      <thead>
+        <tr>
+          <th colspan="7"><h4>{{=T('check').upper()}}</h4></th>
+        </tr>
+        <tr>
+          <th>#</th><th>type</th><th>bank/flag</th><th>control</th>
+          <th>user</th><th>on</th><th class="text-right">value $</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{for n, item in enumerate(CHK):}}
+        <tr>
+          <th>{{=n+1}}</th><td>{{=item.pay_type_str.upper()}}</td><td>{{=item.bank_flag_str}}</td><td>{{=item.num_ctrl}}</td>
+          <td>{{=item.created_by.first_name}}</td><td>{{=item.created_on}}</td><td class="text-right" width="60px">{{=item.amount}}</td>
+        </tr>
+        {{pass}}
+        <tr><th colspan="6" class="text-right">TOTAL</th><th class="text-right">{{=chk}}</th></tr>
+      </tbody>
+    </table>
+    {{pass}}
+
+    {{if PRE:}}
+    <table class="table table-condensed table-hover">
+      <thead>
+        <tr>
+          <th colspan="7"><h4>{{=T('pre check').upper()}}</h4></th>
+        </tr>
+        <tr>
+          <th>#</th><th>type</th><th>bank/flag</th><th>control</th>
+          <th>user</th><th>on</th><th class="text-right">value $</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{for n, item in enumerate(PRE):}}
+        <tr>
+          <th>{{=n+1}}</th><td>{{=item.pay_type_str.upper()}}</td><td>{{=item.bank_flag_str}}</td><td>{{=item.num_ctrl}}</td>
+          <td>{{=item.created_by.first_name}}</td><td>{{=item.created_on}}</td><td class="text-right" width="60px">{{=item.amount}}</td>
+        </tr>
+        {{pass}}
+        <tr><th colspan="6" class="text-right">TOTAL</th><th class="text-right">{{=pre}}</th></tr>
+      </tbody>
+    </table>
+    {{pass}}
+
+    {{if DBT:}}
+    <table class="table table-condensed table-hover">
+      <thead>
+        <tr>
+          <th colspan="7"><h4>{{=T('debit').upper()}}</h4></th>
+        </tr>
+        <tr>
+          <th>#</th><th>type</th><th>bank/flag</th><th>control</th>
+          <th>user</th><th>on</th><th class="text-right">value $</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{for n, item in enumerate(DBT):}}
+        <tr>
+          <th>{{=n+1}}</th><td>{{=item.pay_type_str.upper()}}</td><td>{{=item.bank_flag_str}}</td><td>{{=item.num_ctrl}}</td>
+          <td>{{=item.created_by.first_name}}</td><td>{{=item.created_on}}</td><td class="text-right" width="60px">{{=item.amount}}</td>
+        </tr>
+        {{pass}}
+        <tr><th colspan="6" class="text-right">TOTAL</th><th class="text-right">{{=dbt}}</th></tr>
+      </tbody>
+    </table>
+    {{pass}}
+
+    {{if CDT:}}
+    <table class="table table-condensed table-hover">
+      <thead>
+        <tr>
+          <th colspan="7"><h4>{{=T('credit').upper()}}</h4></th>
+        </tr>
+        <tr>
+          <th>#</th><th>type</th><th>bank/flag</th><th>control</th>
+          <th>user</th><th>on</th><th class="text-right">value $</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{for n, item in enumerate(CDT):}}
+        <tr>
+          <th>{{=n+1}}</th><td>{{=item.pay_type_str.upper()}}</td><td>{{=item.bank_flag_str}}</td><td>{{=item.num_ctrl}}</td>
+          <td>{{=item.created_by.first_name}}</td><td>{{=item.created_on}}</td><td class="text-right" width="60px">{{=item.amount}}</td>
+        </tr>
+        {{pass}}
+        <tr><th colspan="6" class="text-right">TOTAL</th><th class="text-right">{{=cdt}}</th></tr>
+      </tbody>
+    </table>
+    {{pass}}
+
+    {{if DPT:}}
+    <table class="table table-condensed table-hover">
+      <thead>
+        <tr>
+          <th colspan="7"><h4>{{=T('deposit').upper()}}</h4></th>
+        </tr>
+        <tr>
+          <th>#</th><th>type</th><th>bank/flag</th><th>control</th>
+          <th>user</th><th>on</th><th class="text-right">value $</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{for n, item in enumerate(DPT):}}
+        <tr>
+          <th>{{=n+1}}</th><td>{{=item.pay_type_str.upper()}}</td><td>{{=item.bank_flag_str}}</td><td>{{=item.num_ctrl}}</td>
+          <td>{{=item.created_by.first_name}}</td><td>{{=item.created_on}}</td><td class="text-right" width="60px">{{=item.amount}}</td>
+        </tr>
+        {{pass}}
+        <tr><th colspan="6" class="text-right">TOTAL</th><th class="text-right">{{=dpt}}</th></tr>
+      </tbody>
+    </table>
+    {{pass}}
+
+    {{if TRF:}}
+    <table class="table table-condensed table-hover">
+      <thead>
+        <tr>
+          <th colspan="7"><h4>{{=T('transfer').upper()}}</h4></th>
+        </tr>
+        <tr>
+          <th>#</th><th>type</th><th>bank/flag</th><th>control</th>
+          <th>user</th><th>on</th><th class="text-right">value $</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{for n, item in enumerate(TRF):}}
+        <tr>
+          <th>{{=n+1}}</th><td>{{=item.pay_type_str.upper()}}</td><td>{{=item.bank_flag_str}}</td><td>{{=item.num_ctrl}}</td>
+          <td>{{=item.created_by.first_name}}</td><td>{{=item.created_on}}</td><td class="text-right" width="60px">{{=item.amount}}</td>
+        </tr>
+        {{pass}}
+        <tr><th colspan="6" class="text-right">TOTAL</th><th class="text-right">{{=trf}}</th></tr>
+      </tbody>
+    </table>
+    {{pass}}
+
+    {{if CANCELED:}}
+    <table class="table table-condensed table-hover">
+      <thead>
+        <tr class="danger text-danger">
+          <th colspan="7"><h4>{{=T('canceled').upper()}}</h4></th>
+        </tr>
+        <tr>
+          <th>#</th><th>type</th><th>bank/flag</th><th>control</th>
+          <th>user</th><th>on</th><th class="text-right">value $</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{for n, item in enumerate(CANCELED):}}
+        <tr>
+          <th>{{=n+1}}</th><td>{{=item.pay_type_str.upper()}}</td><td>{{=item.bank_flag_str}}</td><td>{{=item.num_ctrl if item.num_ctrl else ''}}</td>
+          <td>{{=item.created_by.first_name}}</td><td>{{=item.created_on}}</td><td class="text-right" width="60px">{{=item.amount}}</td>
+        </tr>
+        {{pass}}
+        <tr class="danger text-danger"><th colspan="6" class="text-right">TOTAL</th><th class="text-right">{{=canceled}}</th></tr>
+      </tbody>
+    </table>
+    {{pass}}
+
+    <table class="table table-condensed table-hover">
+      <tbody>
+        <tr>
+          <th width="85%" class="text-right">{{=T('total collected').upper()}}</th>
+          <th class="text-right">{{=total_collected}}</th>
+        </tr>
+        {{if centers_credit:}}
+        <tr class="text-{{='primary' if centers_credit > 0 else 'danger'}}">
+          <th width="85%" class="text-right">{{=T("center's credit").upper()}}</th>
+          <th class="text-right">{{=centers_credit}}</th>
+        </tr>
+        {{pass}}
+        <tr class="success" style="font-size:14pt;">
+          <th width="85%" class="text-right">{{=T('send to event').upper()}}</th>
+          <th class="text-right">{{=total_transfer}}</th>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<style type="text/css">
+div .table {
+  font-family: monospace;
+}
+</style>

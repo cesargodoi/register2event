@@ -1,0 +1,344 @@
+{{extend 'layout.html'}}
+
+{{block header}}
+{{if event.start_date.strftime('%m')==event.end_date.strftime('%m'):
+    period = '%s à %s' % (event.start_date.strftime('%d'),event.end_date.strftime('%d'))
+  else:
+    period = '%s à %s' % (event.start_date.strftime('%d/%m'),event.end_date.strftime('%d/%m'))
+  pass}}
+
+<div class="row">
+  <div class="col-sm-6">
+    <div>
+      <h3>
+      <strong>{{=event.activity.activity}}</strong>&nbsp;&nbsp;
+      <span class="label label-{{='danger' if event.status=='CLS' else 'primary'}} pull-right">
+        {{=T('CLOSE') if event.status=='CLS' else T('OPEN')}}
+      </span>
+    </h3>
+    </div>
+    <strong>{{=event.center.shortname}} - {{=event.center.city}} ({{=event.center.country}})&nbsp;&nbsp;-&nbsp;&nbsp;{{=event.start_date.strftime('%b/%Y')}}</strong>
+  </div>
+  <div class="col-sm-6">
+    <em>data:</em> <strong>{{=period}}</strong><br />
+    <em>inscrições até:</em> <strong>{{=event.reg_deadline.strftime('%d/%m/%y %H:%M')}}</strong><br />
+    <em>{{=T('registration fee')}}:</em> <strong>${{=event.ref_value}}</strong><br />
+    {{if not view_credits:}}
+    {{if auth.has_membership('root') or (auth.has_membership('admin') and auth.user.center == event.center.id):}}
+      {{if not admin_view:}}
+      <em>inscritos no núcleo:</em> <span class="label label-primary">{{=event_records}}</span>&nbsp;&nbsp;
+      <em>total no evento:</em> <span class="label label-primary">{{=total_registers}}</span>&nbsp;&nbsp;
+      {{else:}}
+      <em>inscritos no evento:</em> <span class="label label-primary">{{=total_registers}}</span>&nbsp;&nbsp;
+      {{pass}}
+    {{else:}}
+    <em>inscritos no núcleo:</em> <span class="label label-primary">{{=event_records}}</span>&nbsp;&nbsp;
+    <em>total no evento:</em> <span class="label label-primary">{{=total_registers}}</span>&nbsp;&nbsp;
+    {{pass}}
+    {{if lates:}}
+    <em>pós-pagamentos:</em> <span class="label label-danger">{{=len(lates)}}</span>
+    {{pass}}
+    {{else:}}
+    <em>créditos antecipados:</em> <span class="label label-primary">{{=event_records}}</span>&nbsp;&nbsp;
+    {{pass}}
+    <br>
+    {{if view_credits==True:}}
+    <h4>créditos antecipados&nbsp;&nbsp;&nbsp;
+      <small><i>
+        <a href="{{=URL('events', 'show', vars={'evenid':event.id, 'view_credits':False})}}">hospedes registrados <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a>
+      </i></small></h4>
+    {{else:}}
+    <h4>hospedes registrados&nbsp;&nbsp;&nbsp;
+      <small><i>
+        <a href="{{=URL('events', 'show', vars={'evenid':event.id, 'view_credits':True})}}">créditos antecipados <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></a></i></small></h4>
+    {{pass}}
+  </div>
+</div>
+{{end}}
+
+{{block control_menu}}
+  {{=search}}
+  &nbsp;
+  <div class="btn-group" role="group">
+    <button type="button"
+            class="btn btn-info"
+            onclick="window.open('{{=URL('list')}}', '_self')">
+      <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+    </button>
+    {{if event.status == 'OPN':}}
+    {{if auth.has_membership('root') or auth.has_membership('admin') or auth.has_membership('office') or request.now < event.reg_deadline:}}
+      {{if request.now > event.reg_deadline:
+          link = URL('register', 'register_step1', vars={'evenid':event.id, 'centid':event.center, 'late':True})
+        else:
+          link = URL('register', 'register_step1', vars={'evenid':event.id, 'centid':event.center})
+        pass
+      }}
+    <button type="button"
+            class="btn btn-primary"
+            onclick="window.open('{{=link}}', '_self')">
+      <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+    </button>
+    {{pass}}
+    {{pass}}
+
+    {{if auth.has_membership('root') or (auth.has_membership('admin') and auth.user.center == event.center.id):}}
+      {{if admin_view:}}
+      <button type="button"
+              class="btn btn-{{='danger' if event.status=='OPN' else 'info'}}"
+              onclick="eventOnOff({{=event.id}})">
+        <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+      </button>
+      <button type="button"
+              class="btn btn-warning"
+              onclick="window.open('{{=URL('edit', vars={'evenid':event.id})}}', '_self')">
+        <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+      </button>
+      <button type="button"
+              class="btn btn-success"
+              onclick="window.open('{{=URL('accommodations', 'buildings_on_event', vars={'evenid':event.id})}}', '_self')">
+        <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
+      </button>
+      {{pass}}
+        {{if not admin_view:
+            url = URL('events', 'show', vars={'evenid':event.id, 'admin_view':'T'})
+          else:
+            url = URL('events', 'show', vars={'evenid':event.id})
+          pass}}
+        <button type="button"
+                class="btn btn-{{='info' if not admin_view else 'danger'}}"
+                onclick="window.open('{{=url}}', '_self')">
+          <span class="glyphicon glyphicon-eye-{{='open' if not admin_view else 'close'}}" aria-hidden="true"></span> admin
+        </button>
+
+    {{pass}}
+  </div>
+{{end}}
+
+{{block link_menu}}
+{{include "link_menu_reports.html" if not session.admin_view else "link_menu_reports_admin.html"}}
+{{end}}
+
+{{if event_records > 0:}}
+{{include 'paginator.html'}}
+
+<div class="row">
+  {{if rows:}}
+  <table class="table table-striped">
+    {{for i, row in enumerate(rows):}}
+      <tr class="text-{{='muted' if row.is_active == False else 'default'}}">
+        <td>
+          <div class="row" style="min-height: 75px;">
+            <div class="col-sm-5">
+              <div class="text-{{='default' if row.is_active == True else 'muted'}}"
+                   style="font-size: 14pt;" id="identification">
+                <strong>{{=shortname(row.name)}}</strong>
+                {{if row.is_active == False:}}
+                &nbsp;&nbsp; <span class="label label-default">cancelado</span>
+                {{pass}}
+              </div>
+              <div style="font-size: 10pt;" id="lodge">
+                <span class="label label-{{='primary' if row.is_active == True else 'default'}}">
+                  {{=LODGE_TYPES[row.lodge]}}
+                </span>
+                {{if row.lodge == 'LDG' and row.bedroom != 'unalloc':}}
+                <span class="text-{{='primary' if row.is_active == True else 'muted'}}"
+                      style="font-weight: bold;">
+                  &nbsp; {{=row.bedroom[0]}} - {{=row.bedroom[1]}}
+                </span>
+                {{elif row.lodge == 'LDG' and row.bedroom == 'unalloc':}}
+                <span class="text-{{='primary' if row.is_active == True else 'muted'}}"
+                      style="font-weight: bold;">
+                  &nbsp; [ não alojado(a) ]
+                </span>
+                {{pass}}
+                {{if row.age:}}
+                {{age_label = 'success'
+                  if row.age > 35 and row.age < 60:
+                    age_label = 'warning'
+                  elif row.age >= 60:
+                    age_label = 'danger'
+                  pass}}
+                <span class="label label-{{=age_label}} pull-right" style="margin-right: 10px;">
+                  <strong>{{=row.age}}</strong>
+                </span>
+                {{pass}}
+                {{if row.no_stairs:}}
+                  <img class="pull-right" style="margin-right: 10px;" src="{{=URL('static', 'images/bedicons', args='NoStairs.png')}}" width="25px">
+                {{pass}}
+                {{if row.no_top_bunk:}}
+                  <img class="pull-right" style="margin-right: 10px;" src="{{=URL('static', 'images/bedicons', args='NoTopBunks.png')}}" width="25px">
+                {{pass}}
+              </div>
+              <div style="font-size: 10pt; padding-top: 8px;" id="staff">
+                {{if row.ps:}}
+                  <span class="text-danger"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        data-container="body"
+                        title="{{=row.ps}}"
+                        style="font-style: italic;">
+                    obs: {{=row.ps[:40]}}
+                  </span>
+                {{pass}}
+              </div>
+
+            </div>
+            <div class="col-sm-5">
+
+              <div style="font-size: 10pt;" id="arrive">
+                <span class="text-{{='default' if row.is_active == True else 'muted'}}">
+                  <i>{{=ARRIVAL_DATE[row.arrival_date]}}, {{=ARRIVAL_TIME[row.arrival_time]}}</i>
+                </span>
+              </div>
+
+              <div style="font-size: 10pt; padding-top: 8px;" id="staff">
+                {{if row.staff:}}
+                  <span class="label label-{{='info' if row.is_active == True else 'default'}}">{{=STAFFS[row.staff]}}</span>
+                  {{if row.description:}}
+                  <span class="text-info"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        data-container="body"
+                        title="{{=row.description}}"
+                        style="font-style: italic;">| {{=row.description[:35]}}</span>
+                  {{pass}}
+                {{pass}}
+              </div>
+
+            </div>
+            <div class="col-sm-2">
+              <div class="text-{{='default' if row.is_active == True else 'muted'}} pull-right"
+                   style="font-size: 12pt;" id="amount">
+                {{if row.late:}}
+                  <span class="text-{{='danger' if row.is_active == True else 'muted'}} glyphicon glyphicon-time" pull-right></span>&nbsp;&nbsp;
+                {{pass}}
+                <strong>R${{=row.amount}}</strong>
+              </div>
+              <div class="clearfix"></div>
+              <div class="btn-group btn-group-xs pull-right" role="group" id="buttons">
+                {{if not view_credits and row.is_active == True:}}
+                {{if row.lodge == 'LDG' and admin_view:}}
+                <button type="button"
+                        class="btn btn-success btn-xs"
+                        data-toggle="modal"
+                        data-target="#confirm"
+                        onclick="getBedroom({{=row.id}},{{=event.id}});">
+                  <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
+                </button>
+                {{pass}}
+                {{pass}}
+                <button type="button"
+                        class="btn btn-{{='info' if row.is_active == True else 'default'}} btn-xs"
+                        data-toggle="modal"
+                        data-target="#confirm"
+                        onclick="regInfo({{=row.regid}});">
+                  <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+                </button>
+                {{if event.status=='OPN':}}
+                  {{if not view_credits and row.is_active == True:}}
+                  <a type="button"
+                     class="btn btn-{{='warning' if row.is_active == True else 'default'}} btn-xs"
+                     href="{{=URL('register', 'edit_stay', vars={'regid':row.regid})}}"
+                     target="_self">
+                    <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                  </a>
+                  {{pass}}
+
+                  {{if not view_credits and (auth.has_membership('root') or auth.has_membership('admin')):}}
+                  <button type="button"
+                          class="btn btn-{{='danger' if row.is_active == True else 'default'}} btn-xs"
+                          data-toggle="modal"
+                          data-target="#confirm"
+                          onclick="unEnrollVerify({{=row.regid}});">
+                    <span class="glyphicon glyphicon-{{='trash' if row.is_active == True else 'log-in'}}" aria-hidden="true"></span>
+                  </button>
+                  {{pass}}
+                {{elif auth.has_membership('root') or (auth.has_membership('admin') and auth.user.center == event.center.id):}}
+                  {{if not view_credits and row.is_active == True:}}
+                  <a type="button"
+                     class="btn btn-{{='warning' if row.is_active == True else 'default'}} btn-xs"
+                     href="{{=URL('register', 'edit_stay', vars={'regid':row.regid})}}"
+                     target="_self">
+                    <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                  </a>
+                  {{pass}}
+                {{pass}}
+
+              </div>
+            </div>
+
+          </div>
+        </td>
+      </tr>
+    {{pass}}
+  </table>
+  {{else:}}
+  <div class="alert alert-warning">
+    <h4>Nenhum <b>{{=T('guest')}}</b> com "{{=term}}" no nome foi encontrado.</h4>
+  </div>
+  {{pass}}
+</div>
+
+{{ include 'paginator.html' }}
+{{ pass }}
+
+<div id="confirm" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"></div>
+
+<style type="text/css">
+div .table {
+  font-family: monospace;
+  font-size: 10pt;
+}
+</style>
+
+<script type="text/javascript">
+function regInfo(regid){
+  ajax(`{{=URL('reports', 'register_info')}}/${regid}`, [], 'confirm');
+}
+function unEnrollVerify(regid){
+  ajax(`{{=URL('register', 'unenroll_verify')}}?regid=${regid}`, [], 'confirm');
+}
+// ok
+function unEnrollGenerateCreditGsc(regid){
+  ajax(`{{=URL('register', 'unenroll_generate_credit_gsc')}}?regid=${regid}`, [], ':eval');
+}
+// ok
+function unEnrollCancelRegistersGsc(regid){
+  ajax(`{{=URL('register', 'unenroll_cancel_registers_gsc')}}?regid=${regid}`, [], ':eval');
+}
+// ok
+function unEnrollCancelRegisterGsc(regid){
+  ajax(`{{=URL('register', 'unenroll_cancel_register_gsc')}}?regid=${regid}`, [], ':eval');
+}
+// ok
+function unEnrollGenCreditLikeRegister(regid){
+  ajax(`{{=URL('register', 'unenroll_gen_credit_like_register')}}?regid=${regid}`, [], ':eval');
+}
+// ok
+function unEnrollGenCreditRearranging(regid){
+  ajax(`{{=URL('register', 'unenroll_gen_credit_rearranging')}}?regid=${regid}`, [], ':eval');
+}
+// ok
+function unEnrollGenerateCredit(regid){
+  ajax(`{{=URL('register', 'unenroll_generate_credit')}}?regid=${regid}`, [], ':eval');
+}
+// ok
+function unEnrollCancelRegister(regid){
+  ajax(`{{=URL('register', 'unenroll_cancel_register')}}?regid=${regid}`, [], ':eval');
+}
+// ok
+function reEnableRegistration(regid){
+  ajax(`{{=URL('register', 'reenable_registration')}}?regid=${regid}`, [], ':eval');
+}
+function eventOnOff(evenid){
+  if (confirm("{{=T('Are you sure')}}?")) {
+     ajax(`{{=URL('event_on_off')}}?evenid=${evenid}`, [], ':eval');
+    }
+};
+function getBedroom(guesid, evenid) {
+  ajax(`{{=URL('accommodations', 'guest_bedroom')}}?evenid=${evenid}&guesid=${guesid}`, [], 'confirm');
+};
+function removeFromBedroom(evenid, guesid, bedroomid) {
+  ajax(`{{=URL('accommodations', 'remove_from_bedroom')}}?evenid=${evenid}&guesid=${guesid}&bedroomid=${bedroomid}&fromguest=T`, [], ':eval');
+};
+</script>

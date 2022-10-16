@@ -1,0 +1,30 @@
+{{extend 'layout.html'}}
+
+{{block header}}
+  <h3>{{=guest}} <small>{{=T('edit stay')}}</small></h3>
+{{end}}
+
+{{block control_menu}}
+  <div class="btn-group" role="group">
+    <button type="button" class="btn btn-info" onclick="goBack()">
+      <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+    </button>
+    <button type="button" class="btn btn-danger" onclick="delStay({{=stay}});">
+      <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+    </button>
+  </div>
+{{end}}
+
+<div class="row">
+  {{=form}}
+</div>
+
+<script type="text/javascript">
+function goBack() {history.go(-1)};
+
+function delStay(num){
+  if (confirm("{{=T('Are you sure')}}?")) {
+     ajax("{{=URL('guest', 'delete_stay')}}/"+num, [], ':eval');
+    }
+};
+</script>

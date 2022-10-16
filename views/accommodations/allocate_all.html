@@ -1,0 +1,65 @@
+{{extend 'layout.html'}}
+
+{{block header}}
+<h3>
+  {{=T('allocate all')}}&nbsp;&nbsp;
+<small>
+  {{=T('summary')}}
+</small>
+</h3>
+{{end}}
+
+{{block control_menu}}
+  <div class="btn-group" role="group">
+    <button type="button"
+            class="btn btn-info"
+            onclick="window.open('{{=URL('accommodations', 'buildings_on_event', vars={'evenid': evenid})}}', '_self')">
+      <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+    </button>
+  </div>
+{{end}}
+
+<div class="row">
+  <div class="col-sm-12">
+    {{if allocateds:}}
+    <h3>{{=T('allocateds')}}</h3>
+    <table class="table table-condensed table-hover">
+      <tr>
+        <th width="8%">#</th>
+        <th width="42%">{{=T('guest name')}}</th>
+        <th width="25%">{{=T('bed type')}}</th>
+        <th width="25%">{{=T('bedroom')}}</th>
+      </tr>
+      {{for n, a in enumerate(allocateds):}}
+      <tr>
+        <td>{{=n+1}}</td>
+        <td>{{=a[1]}}</td>
+        <td>{{='cama de cima' if a[4] == 'top' else 'cama de baixo'}}</td>
+        <td>{{=a[3]}}</td>
+      </tr>
+      {{pass}}
+    </table>
+    {{pass}}
+    {{if unallocateds:}}
+    <h3>{{=T('unallocateds')}}</h3>
+    <table class="table table-condensed table-hover">
+      <tr>
+        <th width="8%">#</th>
+        <th width="92%">nome</th>
+      </tr>
+      {{for n, u in enumerate(unallocateds):}}
+      <tr>
+        <td>{{=n+1}}</td>
+        <td>{{=u[1]}}</td>
+      </tr>
+      {{pass}}
+    </table>
+    {{pass}}
+  </div>
+</div>
+
+<style type="text/css">
+div .table {
+  font-family: monospace;
+}
+</style>

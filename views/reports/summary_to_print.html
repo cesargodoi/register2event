@@ -1,0 +1,90 @@
+{{extend 'layout-print-ls.html'}}
+
+{{block header}}
+<h3>{{=event.activity.activity}}</h3>
+<strong> {{=event.start_date.strftime('%B de %Y')}}</strong>&nbsp;&nbsp;
+<strong>{{=event.center.center}} - {{=event.center.city}} ({{=event.center.country}})</strong>&nbsp;&nbsp;
+<strong>{{=len(rows)}} inscritos</strong>
+{{end}}
+
+<div class="row">
+  <div class="col-md-12">
+    <table class="table table-condensed">
+      <thead>
+        <tr>
+          <th width="22%">nome</th>
+          <th width="5%">aloj.</th>
+          <th width="10%">não pode</th>
+          <th width="15%">chegada</th>
+          <th width="15%">staff</th>
+          <th width="25%">obs</th>
+          <th width="8%"class="text-right">R$</th>
+        </tr>
+      </thead>
+      <tbody>
+      {{for i, row in enumerate(rows):}}
+        <tr>
+          <td>
+            {{=shortname(row['name'])}}
+          </td>
+          {{if row['lodge'] == 'LDG':
+              lodge = 'alj.'
+            elif row['lodge'] == 'HSE':
+              lodge = 'cas.'
+            elif row['lodge'] == 'HTL':
+              lodge = 'htl.'
+              pass}}
+          <td>
+            <strong>{{=lodge}}</strong>
+          </td>
+          <td>
+            {{if row['no_stairs']:}}
+            <strong>esc.</strong>
+            {{pass}}
+            {{if row['no_top_bunk']:}}
+            <strong>c.cima</strong>
+            {{pass}}
+          </td>
+          <td>
+            {{if row['arrival_date'] == 'D0':
+                dia = 'vespera'
+              elif row['arrival_date'] == 'D1':
+                dia = '1o. dia'
+              elif row['arrival_date'] == 'D2':
+                dia = '2o. dia'
+                pass
+              if row['arrival_time'] == 'BB':
+                hora = 'café'
+              elif row['arrival_time'] == 'BL':
+                hora = 'almoço'
+              elif row['arrival_time'] == 'BD':
+                hora = 'jantar'
+              elif row['arrival_time'] == 'AD':
+                hora = 'pernoite'
+                pass}}
+
+            {{=dia}}, {{=hora}}
+          </td>
+          <td>
+            {{if row['staff']:}}
+            <i>{{=STAFFS[row['staff']]}}</i>
+            {{pass}}
+          </td>
+          <td>
+            {{if row['ps']:}}{{=row['ps']}}{{pass}}
+          </td>
+          <td class="text-right">
+            <b>{{='C' if 'GSC' in row['payforms'] else ''}} {{=row['amount']}}</b>
+          </td>
+        </tr>
+      {{pass}}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<style type="text/css">
+div .table {
+  font-family: monospace;
+}
+</style>

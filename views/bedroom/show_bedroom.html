@@ -1,0 +1,123 @@
+{{extend 'layout.html'}}
+
+{{block header}}
+{{
+  if bedroom.gender=='M':
+    gender_txt = T('masculine')
+    gender_color = 'primary'
+  elif bedroom.gender=='F':
+    gender_txt = T('feminine')
+    gender_color = 'warning'
+  else:
+    gender_txt = T('mixed')
+    gender_color = 'info'
+  pass
+}}
+<div class="row">
+  <div class="col-sm-12">
+    <h3><strong>{{=bedroom.bedroom}}</strong>&nbsp;&nbsp;
+      <small>
+        {{=building_repr % bedroom.builid}}&nbsp;&nbsp;
+        <span class="label label-{{=gender_color}}">{{=gender_txt}}</span>
+      </small>
+    </h3>
+  </div>
+</div>
+{{end}}
+
+{{block control_menu}}
+  <div class="btn-group" role="group">
+    {{if auth.has_membership('root') or auth.has_membership('admin'):}}
+    <button type="button"
+            class="btn btn-{{='danger' if bedroom.is_active else 'primary'}}"
+            onclick="BedroomOnOff({{=bedroom.id}})">
+      <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+    </button>
+    <button type="button"
+            class="btn btn-warning"
+            onclick="window.open('{{=URL('edit_bedroom', vars={'bedroomid':bedroom.id})}}', '_self')">
+      <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+    </button>
+    <button type="button"
+            class="btn btn-danger"
+            onclick="delBedroom({{=bedroom.id}},{{=bedroom.builid}})">
+      <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+    </button>
+    {{pass}}
+    <button type="button"
+            class="btn btn-info"
+            onclick="window.open('{{=URL('list_bedrooms_by_gender', vars={'builid':bedroom.builid, 'gender':bedroom.gender})}}', '_self')">
+      <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+    </button>
+  </div>
+{{end}}
+
+{{block link_menu}}
+{{end}}
+
+<div class="row">
+  {{if bedroom.top_bunks:}}
+  <div class="col-sm-4">
+    <table class="table table-striped">
+      <caption>camas de baixo</caption>
+      {{for i in range(int(bedroom.beds)):}}
+      <tr>
+        <td width="30px">
+          <img src="{{=URL('static', 'images/bedicons', args='bed_BY.png')}}" draggable="true"><br>
+        </td>
+        <td>{{=T('ready to use')}}</td>
+      </tr>
+      {{pass}}
+    </table>
+  </div>
+  <div class="col-sm-4">
+    <table class="table table-striped">
+      <caption>camas de cima</caption>
+      {{for i in range(int(bedroom.top_bunks)):}}
+      <tr>
+        <td width="30px">
+          <img src="{{=URL('static', 'images/bedicons', args='bed_TY.png')}}" draggable="true"><br>
+        </td>
+        <td>{{=T('ready to use')}}</td>
+      </tr>
+      {{pass}}
+    </table>
+  </div>
+  {{else:}}
+  <div class="col-sm-4">
+    <table class="table table-striped">
+      <caption>camas</caption>
+      {{for i in range(int(bedroom.beds)):}}
+      <tr>
+        <td width="30px">
+          <img src="{{=URL('static', 'images/bedicons', args='bed_Y.png')}}" draggable="true"><br>
+        </td>
+        <td>{{=T('ready to use')}}</td>
+      </tr>
+      {{pass}}
+    </table>
+  </div>
+  {{pass}}
+</div>
+
+<div id="confirm" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"></div>
+
+<style type="text/css">
+div .table {
+  font-family: monospace;
+  font-size: 10pt;
+}
+</style>
+
+<script type="text/javascript">
+function BedroomOnOff(bid){
+  if (confirm("{{=T('Are you sure')}}?")) {
+     ajax(`{{=URL('bedroom_on_off')}}?bedroomid=${bid}`, [], ':eval');
+    }
+};
+function delBedroom(bid){
+  if (confirm("{{=T('Are you sure')}}?")) {
+     ajax(`{{=URL('delete_bedroom')}}?bedroomid=${bid}`, [], ':eval');
+    }
+};
+</script>

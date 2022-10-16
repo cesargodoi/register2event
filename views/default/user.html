@@ -1,0 +1,21 @@
+{{extend 'layout.html'}}
+
+<style type="text/css">
+  body {
+    background-color: #eee;
+  }
+  .form-signin {
+    max-width: 500px;
+    padding: 15px;
+    margin: 0 auto;
+  }
+</style>
+
+{{block header}}
+<div class="form-signin">
+  {{=form}}
+</div>
+{{end}}
+
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+<script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>

@@ -1,0 +1,65 @@
+{{extend 'layout-print-ls.html'}}
+
+{{block header}}
+<h3>Hospedes por Refeição</h3>
+<strong>{{=event.activity.activity}}</strong>&nbsp;&nbsp;
+<strong>{{=event.start_date.strftime('%B de %Y')}}</strong>&nbsp;&nbsp;
+<strong>{{=event.center.center}} - {{=event.center.city}} ({{=event.center.country}})</strong>&nbsp;&nbsp;
+<strong>{{=rows}} inscritos</strong>
+{{end}}
+
+<div class="row">
+  <div class="col-md-12">
+    <br><br><br>
+    <table class="table table-hover">
+      <thead>
+        <th width="25%"></th>
+        <th width="25%" class="info">Café</th>
+        <th width="25%" class="info">Almoço</th>
+        <th width="25%" class="info">Jantar</th>
+      </thead>
+      <tbody>
+        <tr>
+          <th class="active">Véspera</th>
+          <th></th>
+          <th>{{=meals[0]}}</th>
+          <th>{{=meals[1]}}</th>
+        </tr>
+        <tr>
+          <th class="active">Primeiro Dia</th>
+          <th>{{=meals[2]-guests_out[0]}} <i style="font-size: 10pt;"><span class="text-danger">({{=guests_out[0]}} out)</span></i></th>
+          <th>{{=meals[3]}}</th>
+          <th>{{=meals[4]}}</th>
+        </tr>
+        <tr>
+          <th class="active">Segundo Dia</th>
+          <th>{{=meals[5]-guests_out[1]}} <i style="font-size: 10pt;"><span class="text-danger">({{=guests_out[1]}} out)</span></i></th>
+          <th>{{=meals[6]}}</th>
+
+          {{if conf_days > 2:}}
+          <th>{{=meals[7]}}</th>
+          {{else:}}
+          <th></th>
+          {{pass}}
+
+        </tr>
+        {{if conf_days > 2:}}
+        <tr>
+          <th class="active">Terceiro Dia</th>
+          <th>{{=meals[5]-guests_out[2]}} <i style="font-size: 10pt;"><span class="text-danger">({{=guests_out[2]}} out)</span></i></th>
+          <th>{{=meals[6]}}</th>
+          <th></th>
+        </tr>
+        {{pass}}
+
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<style type="text/css">
+div .table {
+  font-family: monospace;
+  font-size: 14pt;
+}
+</style>

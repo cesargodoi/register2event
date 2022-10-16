@@ -1,0 +1,207 @@
+{{extend 'layout.html'}}
+
+{{block header}}
+{{
+  if bedroom.gender=='M':
+    gender_txt = T('masculine')
+    gender_color = 'primary'
+  elif bedroom.gender=='F':
+    gender_txt = T('feminine')
+    gender_color = 'warning'
+  else:
+    gender_txt = T('mixed')
+    gender_color = 'info'
+  pass
+}}
+<div class="row">
+  <div class="col-sm-12">
+    <h3><strong>{{=bedroom.bedroom}}</strong>&nbsp;&nbsp;
+      <small>
+        {{=building[1]}}&nbsp;&nbsp;
+        <span class="label label-{{=gender_color}}">{{=gender_txt}}</span>
+      </small>
+    </h3>
+  </div>
+</div>
+{{end}}
+
+{{block control_menu}}
+  <ol class="breadcrumb">
+    <li><a href="{{=URL('events', 'show', vars={'evenid': event.id, 'admin_view':'T'})}}">{{=T('event')}}</a></li>
+    <li><a href="{{=URL('accommodations', 'buildings_on_event', vars={'evenid': event.id})}}">{{=T('buildings')}}</a></li>
+    <li><a href="{{=URL('accommodations', 'building_on_event', vars={'builid':building[0], 'evenid': event.id})}}">{{=T('building')}}</a></li>
+    <li><a href="{{=URL('accommodations', 'bedrooms_by_gender_on_event', vars={'builid':building[0],'gender':bedroom.gender, 'evenid':event.id})}}">{{=T('bedrooms by gender')}}</a></li>
+    <li class="active">{{=T('bedroom')}}</li>
+  </ol>
+{{end}}
+
+{{block link_menu}}
+{{end}}
+
+<div class="row">
+  {{if bedroom.tops:}}
+  <div class="col-sm-6">
+    <table class="table table-striped">
+      <caption>{{=T('beds')}}</caption>
+      {{for i in bedroom.beds:}}
+        {{if i > 0:}}
+        <tr>
+          <td width="30px">
+            <img src="{{=URL('static', 'images/bedicons', args='bed_BN.png')}}"><br>
+          </td>
+          <td>
+            {{=guests[i]['name']}}
+            <button type="button"
+                    class="btn btn-danger btn-xs pull-right"
+                    onclick="removeFromBedroom({{=i}})">
+              <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+            </button>
+            {{label = 'success'
+              if guests[i]['age']>35 and guests[i]['age']<60:
+                label = 'warning'
+              elif guests[i]['age']>=60:
+                label = 'danger'
+              pass}}
+            <span class="label label-{{=label}} pull-right" style="margin-right: 10px;">{{=guests[i]['age']}}</span>
+            {{if guests[i]['no_stairs']:}}
+            <img class="pull-right" style="margin-right: 10px;" src="{{=URL('static', 'images/bedicons', args='NoStairs.png')}}" width="22px">
+            {{pass}}
+            {{if guests[i]['no_top_bunk']:}}
+            <img class="pull-right" style="margin-right: 10px;" src="{{=URL('static', 'images/bedicons', args='NoTopBunks.png')}}" width="22px">
+            {{pass}}
+          </td>
+        </tr>
+        {{else:}}
+        <tr>
+          <td width="30px">
+            <img src="{{=URL('static', 'images/bedicons', args='bed_BY.png')}}" draggable="true">
+          </td>
+          <td>
+            {{=T('ready to use')}}
+          </td>
+        </tr>
+        {{pass}}
+      {{pass}}
+    </table>
+  </div>
+  <div class="col-sm-6">
+    <table class="table table-striped">
+      <caption>{{=T('top bunks')}}</caption>
+      {{for i in bedroom.tops:}}
+        {{if i > 0:}}
+        <tr>
+          <td width="30px">
+            <img src="{{=URL('static', 'images/bedicons', args='bed_TN.png')}}" draggable="true">
+          </td>
+          <td>
+            {{=guests[i]['name']}}
+            <button type="button"
+                    class="btn btn-danger btn-xs pull-right"
+                    onclick="removeFromBedroom({{=i}})">
+              <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+            </button>
+            {{label = 'success'
+              if guests[i]['age']>35 and guests[i]['age']<60:
+                label = 'warning'
+              elif guests[i]['age']>=60:
+                label = 'danger'
+              pass}}
+            <span class="label label-{{=label}} pull-right" style="margin-right: 10px;">{{=guests[i]['age']}}</span>
+            {{if guests[i]['no_stairs']:}}
+            <img class="pull-right" style="margin-right: 10px;" src="{{=URL('static', 'images/bedicons', args='NoStairs.png')}}" width="22px">
+            {{pass}}
+            {{if guests[i]['no_top_bunk']:}}
+            <img class="pull-right" style="margin-right: 10px;" src="{{=URL('static', 'images/bedicons', args='NoTopBunks.png')}}" width="22px">
+            {{pass}}
+          </td>
+        </tr>
+        {{else:}}
+        <tr>
+          <td width="30px">
+            <img src="{{=URL('static', 'images/bedicons', args='bed_TY.png')}}" draggable="true">
+          </td>
+          <td>{{=T('ready to use')}}</td>
+        </tr>
+        {{pass}}
+      {{pass}}
+    </table>
+  </div>
+  {{else:}}
+  <div class="col-sm-6">
+    <table class="table table-striped">
+      <caption>{{=T('beds')}}</caption>
+      {{for i in bedroom.beds:}}
+        {{if i > 0:}}
+        <tr>
+          <td width="30px">
+            <img src="{{=URL('static', 'images/bedicons', args='bed_N.png')}}" draggable="true">
+          </td>
+          <td>
+            {{=guests[i]['name']}}
+            <button type="button"
+                    class="btn btn-danger btn-xs pull-right"
+                    onclick="removeFromBedroom({{=i}})">
+              <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+            </button>
+            {{label = 'success'
+              if guests[i]['age']>35 and guests[i]['age']<60:
+                label = 'warning'
+              elif guests[i]['age']>=60:
+                label = 'danger'
+              pass}}
+            <span class="label label-{{=label}} pull-right" style="margin-right: 10px;">{{=guests[i]['age']}}</span>
+            {{if guests[i]['no_stairs']:}}
+            <img class="pull-right" style="margin-right: 10px;" src="{{=URL('static', 'images/bedicons', args='NoStairs.png')}}" width="22px">
+            {{pass}}
+            {{if guests[i]['no_top_bunk']:}}
+            <img class="pull-right" style="margin-right: 10px;" src="{{=URL('static', 'images/bedicons', args='NoTopBunks.png')}}" width="22px">
+            {{pass}}
+          </td>
+        </tr>
+        {{else:}}
+        <tr>
+          <td width="30px">
+            <img src="{{=URL('static', 'images/bedicons', args='bed_Y.png')}}" draggable="true">
+          </td>
+          <td>
+            {{=T('ready to use')}}
+          </td>
+        </tr>
+        {{pass}}
+      {{pass}}
+    </table>
+  </div>
+  {{pass}}
+  {{if session.mapp.unallocateds:}}
+  {{include 'guests_unallocated.html'}}
+  {{pass}}
+</div>
+
+<div id="confirm" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"></div>
+
+<style type="text/css">
+div .table {
+  font-family: monospace;
+  font-size: 10pt;
+}
+</style>
+
+<script type="text/javascript">
+function addToBedroom(gid, rid){
+  var bd = {{=bedroom.id}};
+  var gn = '{{=bedroom.gender}}';
+  var ev = {{=event.id}};
+  if (confirm("{{=T('Are you sure')}}?")) {
+    ajax(`{{=URL('accommodations', 'add_to_bedroom')}}?evenid=${ev}&bedroomid=${bd}&guesid=${gid}&regid=${rid}&gender=${gn}`, [], ':eval');
+  }
+}
+
+function removeFromBedroom(gs){
+  var bd = {{=bedroom.id}};
+  var ev = {{=event.id}};
+  if (confirm("{{=T('Are you sure')}}?")) {
+    ajax(`{{=URL('accommodations', 'remove_from_bedroom')}}?evenid=${ev}&bedroomid=${bd}&guesid=${gs}`, [], ':eval');
+  }
+}
+
+</script>

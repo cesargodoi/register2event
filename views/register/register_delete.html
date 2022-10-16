@@ -1,0 +1,239 @@
+{{extend 'layout.html'}}
+
+{{block header}}
+<header class="container-fluid jumbotron">
+  <div class="text-center">
+    <h2>
+      {{=T('delete register or generate credit')}}
+    </h2>
+  </div>
+</header>
+{{end}}
+
+{{block control_menu}}
+  <button id="add" type="button" class="btn btn-primary navbar-btn" onclick="window.open('{{=URL('register', 'register_step1', vars={'evenid':evenid, 'centid':centid})}}', '_self')">
+    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+  </button>
+  <button type="button" class="btn btn-danger navbar-btn" onclick="window.open('{{=URL('events', 'show', vars={'evenid':evenid})}}', '_self')">
+    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+  </button>
+{{end}}
+
+<div class="row">
+  <div class="col-md-6">
+    <table class="table table-hover table-condensed">
+      <caption>guests and amounts</caption>
+      <thead>
+        <tr>
+          <th width="5%">#</th>
+          <th width="30%">{{=T('guest')}}</th>
+          <th width="50%"></th>
+          <th width="10%" class="text-right">{{=T('value')}} ({{=T('$')}})</th>
+          <th width="5%"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {{js_vars = []
+        js_to_update = []
+        totalpay = 0.
+        for n, guest in enumerate(guests):
+          var = 'amount%s' % str(n+1)
+          to_update = '%s.name,%s.value' % (var, var)
+          js_vars.append(var)
+          js_to_update.append(to_update)
+        }}
+        <tr>
+          <th scope="row">{{=n+1}}</th>
+          <td>{{=shortname(guest.name)}}</td>
+          <td>
+            {{if guest.credit:
+                  for cr in guest.credit.credits:}}
+              <span class="label label-info">{{=cr[1]}}: ${{=cr[0]}}</span>
+                {{pass
+                pass}}
+          </td>
+          <td>
+            <input class="form-control text-right" name="{{=guest.guesid}}" id="amount{{=str(n+1)}}" type="text" value="{{=guest.amount}}" onblur="newEntry(this,{{=guest.guesid}});toConclude();" style="width: 80px">
+          </td>
+          <td>
+            <button type="button" class="btn btn-danger btn-xs" onclick="delGuest({{=guest.guesid}});">
+              <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+            </button>
+          </td>
+        </tr>
+        {{pass}}
+        <tr>
+          <td colspan="2"></td>
+          <td class="text-right"><strong>TOTAL</strong></td>
+          <td>
+            <input class="form-control text-right" name="total" id="total" type="text"  style="width: 80px" disabled>
+          </td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+    {{express = ' + '.join(js_vars)
+      express_to_updt = ','.join(js_to_update)}}
+
+  </div>
+  <div id="payment_forms" class="col-md-6">
+    {{if not payforms:}}
+    <table class="table table-hover table-condensed" style="display: none">
+    {{else:}}
+    <table class="table table-hover table-condensed">
+    {{pass}}
+      <caption>{{=T('payment forms')}}</caption>
+      <thead>
+        <tr>
+          <th width="5%">#</th>
+          <th width="10%">{{=T('type')}}</th>
+          <th width="30%">{{=T('details')}}</th>
+          <th width="40%"></th>
+          <th width="10%" class="text-right">{{=T('value')}} ({{=T('$')}})</th>
+          <th width="5%"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {{for i, pf in enumerate(payforms):}}
+        <tr id="pf{{=i}}">
+          <th scope="row">{{=i+1}}</th>
+          <td>{{=pf.ptype}}</td>
+          {{if pf.ptype=="GSC":}}
+          <td>{{=GSC[int(pf.gscred)]}}</td>
+          <td>{{=('%(shortname)s' % Center[pf.centcred])}} &nbsp;&nbsp;<span class="label label-info">{{=T('credit')}}</span></td>
+          {{else:}}
+          <td>{{=pf.bflagname}}</td><td>{{=pf.ctrl}}</td>
+          {{pass}}
+          <td class="text-right"><b>{{='%1.2f' % pf.value}}</b></td>
+          {{totalpay += float(pf.value)}}
+          <td>
+            <button type="button" class="btn btn-danger btn-xs" onclick="delPayform({{=i}});">
+              <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+            </button>
+          </td>
+        </tr>
+        {{pass}}
+        <tr>
+          <td colspan="3"></td>
+          <td  class="text-right"><strong>{{=T('DEBT')}}</strong></td>
+          <td>
+            <input class="form-control text-right" name="debt" id="debt" type="text"  style="width: 80px" disabled>
+          </td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+    <button id="addPayForms" type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#payForms">{{=T('payment form')}}</button>
+    <a id="conclude" class="btn btn-primary btn-lg" href="{{=URL('register', 'conclude')}}" style="display: none;">{{=T('conclude')}}</a>
+    <button class="btn btn-danger btn-lg" onclick="window.open('{{=URL('events', 'show', vars={'evenid':evenid})}}', '_self')">{{=T('cancel')}}</button>
+  </div>
+</div>
+
+<!-- modal -->
+<div id="choose" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"></div>
+
+<div class="modal fade" id="payForms" tabindex="-1" role="dialog" aria-labelledby="payFormsLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header"><h4 class="modal-title" id="payFormsLabel">{{=T('payment form')}}</h4></div>
+      <div class="modal-body">{{=form}}</div>
+    </div>
+  </div>
+</div>
+
+
+
+<script type="text/javascript">
+jQuery(document).ready(function(){
+  calculate();
+  jQuery('#no_table_bflag__row').hide();
+  jQuery('#no_table_ctrl__row').hide();
+  debt();
+  payType();
+  toConclude();
+});
+
+function calculate(){ {{for vr in js_vars:}}
+  var {{=vr}} = parseFloat(document.getElementById('{{=vr}}').value); {{pass}}
+  document.getElementById('total').value = {{=express}};
+
+};
+
+function debt(){
+  var total = document.getElementById('total').value
+  document.getElementById('debt').value = -total + {{=totalpay}}
+};
+
+function payType(){
+  var tp = document.getElementById('no_table_ptype');
+  var type = tp.options[tp.selectedIndex].value;
+  if (type == 'CSH'){
+    jQuery('#no_table_bflag__row').hide();
+    jQuery('#no_table_ctrl__row').hide();
+    jQuery('#no_table_gscred__row').hide();
+    jQuery('#no_table_value__row').show();
+  } else if (type == 'GSC'){
+    jQuery('#no_table_bflag__row').hide();
+    jQuery('#no_table_ctrl__row').hide();
+    jQuery('#no_table_gscred__row').show();
+    jQuery('#no_table_value__row').show();
+  } else if (type == 'FRE'){
+    jQuery('#no_table_bflag__row').hide();
+    jQuery('#no_table_ctrl__row').hide();
+    jQuery('#no_table_gscred__row').hide();
+    jQuery('#no_table_value__row').hide();
+  } else {
+    jQuery('#no_table_bflag__row').show();
+    jQuery('#no_table_ctrl__row').show();
+    jQuery('#no_table_gscred__row').hide();
+    jQuery('#no_table_value__row').show();
+  }
+};
+
+function toConclude(){
+  var total = parseFloat(document.getElementById('total').value);
+  var debt = parseFloat(document.getElementById('debt').value);
+  if (total != 0 && debt == 0){
+    jQuery('#conclude').show()
+    jQuery('#addPayForms').hide()
+  } else {
+    jQuery('#conclude').hide()
+    jQuery('#addPayForms').show()
+  }
+};
+
+function newEntry(inp, guesid){
+  var amount = parseFloat(inp.value)
+  if (inp.value == ''){inp.value = '0'};
+  ajax("{{=URL('register', 'reg_updt_amount')}}/"+guesid+"/"+amount, [], ':eval');
+  calculate();
+  debt();
+};
+
+function paymentForm(){
+  ajax("{{=URL('register', 'payment_form')}}", [], 'choose');
+};
+
+function delGuest(num){
+  if (confirm("{{=T('Are you sure')}}?")) {
+     ajax("{{=URL('register', 'reg_del_guest')}}/"+num, [], ':eval');
+    }
+};
+
+function delPayform(num){
+  if (confirm("{{=T('Are you sure')}}?")) {
+     ajax("{{=URL('register', 'reg_del_payform')}}/"+num, [], ':eval');
+    }
+};
+
+function getPaymentForm(){
+  var tp = document.getElementById('no_table_ptype');
+  var type = tp.options[tp.selectedIndex].value;
+  var bf = document.getElementById('no_table_bflag');
+  var bankflag = bf.options[bf.selectedIndex].text;
+  var control = document.getElementById('no_table_ctrl').value;
+  var value = document.getElementById('no_table_value').value;
+  var form = type+'/'+bankflag+'/'+control+'/'+value;
+  ajax("{{=URL('register', 'payforms_pickle')}}/"+form, [], ':eval');
+};
+</script>

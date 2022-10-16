@@ -1,0 +1,7 @@
+{{extend 'layout.html'}}
+
+{{block header}}
+<h3>{{=' '.join(x.capitalize() for x in request.function.split('_'))}}</h3>
+{{end}}
+
+{{=response.toolbar()}}

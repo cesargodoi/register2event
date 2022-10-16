@@ -1,0 +1,61 @@
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{=T('reports')}}</a>
+  <ul class="dropdown-menu">
+    {{if event_records > 0:}}
+    <li class="dropdown-header">{{=T('regular payments')}}</li>
+    <li>
+      <a href="{{=URL('reports', 'cash_balance', vars={'evenid':event.id})}}" target="_blank">{{=T('cash balance')}}</a>
+    </li>
+    <li>
+      <a href="{{=URL('reports', 'payment_by_guest', vars={'evenid':event.id})}}"  target="_blank">{{=T('payment by guest')}}</a>
+    </li>
+    <li>
+      <a href="{{=URL('reports', 'total_by_center', vars={'evenid':event.id})}}" target="_blank">{{=T('total by center')}}</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">{{=T('others')}}</li>
+    <li>
+      <a href="{{=URL('reports', 'to_stn', vars={'evenid':event.id})}}" target="_blank">{{=T('to STN')}} (.csv)</a>
+    </li>
+    <li>
+      <a href="{{=URL('reports', 'frequencies', vars={'evenid':event.id})}}" target="_blank">{{=T('frequencies')}} (.txt)</a>
+    </li>
+    {{if lates:}}
+    <li class="divider"></li>
+    <li class="dropdown-header">{{=T('late payments')}}</li>
+    <li>
+      <a href="{{=URL('reports', 'cash_balance', vars={'evenid':event.id, 'late':True})}}" target="_blank">{{=T('cash balance')}}</a>
+    </li>
+    <li>
+      <a href="{{=URL('reports', 'payment_by_guest', vars={'evenid':event.id, 'late':True})}}"  target="_blank">{{=T('payment by guest')}}</a>
+    </li>
+    <li>
+      <a href="{{=URL('reports', 'to_jarinu', vars={'evenid':event.id, 'late':True})}}" target="_blank">{{=T('to jarinu')}} (.csv)</a>
+    </li>
+    {{pass}}
+    <li class="divider"></li>
+    <li>
+      <a href="{{=URL('reports', 'pupils_guests_center', vars={'evenid':event.id})}}" target="_blank">{{=T("pupil's guests")}}</a>
+    </li>
+    {{pass}}
+
+    {{if request.now > event.reg_deadline:
+        link_gencred = URL('register', 'register_step1', vars={'evenid':event.id, 'centid':event.center, 'gencredit':True, 'late':True})
+      else:
+        link_gencred = URL('register', 'register_step1', vars={'evenid':event.id, 'centid':event.center, 'gencredit':True})
+      pass
+    }}
+    {{if event.status == 'OPN':}}
+    <li class="divider"></li>
+    <li>
+      <center>
+        <button type="button"
+                class="btn btn-default btn-sm"
+                onclick="window.open('{{=link_gencred}}', '_self')">
+          <span class="glyphicon glyphicon-usd" aria-hidden="true"></span> {{=T('generate credit')}}
+        </button>
+      </center>
+    </li>
+    {{pass}}
+  </ul>
+</li>

@@ -1,0 +1,60 @@
+{{extend 'layout.html'}}
+
+{{block header}}
+<h2>{{=T('list of buildings')}}</h2>
+{{end}}
+
+{{block link_menu}}{{end}}
+
+{{block control_menu}}
+  <div class="btn-group" role="group">
+    {{if auth.has_membership('root') or auth.has_membership('admin'):}}
+    <button type="button" class="btn btn-primary" onclick="window.open('{{=URL('new_building')}}', '_self')">
+      <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+    </button>
+    {{pass}}
+    <button type="button" class="btn btn-info" onclick="goBack()">
+      <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+    </button>
+  </div>
+{{end}}
+
+<!-- define the paginator -->
+{{if rows:}}
+<br />
+<div class="row">
+  <div class="col-sm-12">
+    <table class="table table-hover table-condensed">
+      {{for row in rows:}}
+      <tr id="{{=row.id}}" onclick="window.open('{{=URL('show_building', vars={'builid':row.id})}}', '_self')">
+        {{onOff = 'primary' if row.is_active else 'warning'}}
+        <td width="30px" class="bg-{{=onOff}}">
+          <center>
+            <span class="glyphicon glyphicon-home"></span>
+          </center>
+        </td>
+        <td>
+          <strong>{{=row.building}}</strong>&nbsp;&nbsp;&nbsp;<em>{{=row.description}}</em>&nbsp;&nbsp;&nbsp;<br />
+          <div style="font-size:10pt;">
+            <strong>{{=T('place')}}:</strong> <em>{{=center_repr % row.center}}</em><br>
+            {{if row.male:}}
+            <strong>{{=T('male')}}:</strong> <span class="label label-default">{{=row.male}}</span>&nbsp;&nbsp;&nbsp;
+            {{pass}}
+            {{if row.fema:}}
+            <strong>{{=T('female')}}:</strong> <span class="label label-default">{{=row.fema}}</span>&nbsp;&nbsp;&nbsp;
+            {{pass}}
+            {{if row.mixd:}}
+            <strong>{{=T('mixed')}}:</strong> <span class="label label-default">{{=row.mixd}}</span>
+            {{pass}}
+          </div>
+        </td>
+      </tr>
+      {{pass}}
+    </table>
+  </div>
+</div>
+{{pass}}
+
+<script type="text/javascript">
+function goBack() {history.go(-1)};
+</script>

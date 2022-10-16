@@ -1,0 +1,18 @@
+{{extend 'layout.html'}}
+{{block header}}
+  <h3>{{=T('cash balance')}}</h3>
+{{end}}
+
+{{block control_menu}}
+  <button type="button" class="btn btn-info" onclick="goBack()">
+    <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+  </button>
+{{end}}
+
+<div class="row">
+  {{=form}}
+</div>
+
+<script type="text/javascript">
+function goBack() {history.go(-1)};
+</script>

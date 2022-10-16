@@ -1,0 +1,35 @@
+<style type="text/css">
+  @media screen {
+    .floating {
+      position: absolute;
+      left: 0px;
+      top: 0px;
+      z-index: 200;
+      margin: 10px;
+      padding: 10px;
+      background-color: #e3e3e3;
+    }
+  }
+  @media print {
+    a,
+    #controlers {display: none;}
+  }
+</style>
+<br />
+{{block controlers}}
+<div id="controlers" name="controlers" class="floating">
+  <a class="btn btn-warning" href="#" onclick="reload()">
+    <span class="glyphicon glyphicon-print"></span>
+  </a>
+  <button type="button" class="btn btn-danger navbar-btn" onclick="window.close()">
+    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+  </button>
+</div>
+{{end}}
+
+<!-- scripts javascript -->
+<script type="text/javascript">
+  function reload(){
+    window.print();
+  }
+</script>

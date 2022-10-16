@@ -1,0 +1,516 @@
+timestamp: 2017-08-11T16:44:21.178657
+CREATE TABLE "auth_user"(
+    "id" SERIAL PRIMARY KEY,
+    "first_name" VARCHAR(128),
+    "last_name" VARCHAR(128),
+    "email" VARCHAR(512),
+    "password" VARCHAR(512),
+    "registration_key" VARCHAR(512),
+    "reset_password_key" VARCHAR(512),
+    "registration_id" VARCHAR(512),
+    "center" INTEGER
+);
+success!
+timestamp: 2017-08-11T16:44:21.292090
+CREATE TABLE "auth_group"(
+    "id" SERIAL PRIMARY KEY,
+    "role" VARCHAR(512),
+    "description" TEXT
+);
+success!
+timestamp: 2017-08-11T16:44:21.400417
+CREATE TABLE "auth_membership"(
+    "id" SERIAL PRIMARY KEY,
+    "user_id" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  ,
+    "group_id" INTEGER REFERENCES "auth_group" ("id") ON DELETE CASCADE  
+);
+success!
+timestamp: 2017-08-11T16:44:21.478457
+CREATE TABLE "auth_permission"(
+    "id" SERIAL PRIMARY KEY,
+    "group_id" INTEGER REFERENCES "auth_group" ("id") ON DELETE CASCADE  ,
+    "name" VARCHAR(512),
+    "table_name" VARCHAR(512),
+    "record_id" INTEGER
+);
+success!
+timestamp: 2017-08-11T16:44:21.579460
+CREATE TABLE "auth_event"(
+    "id" SERIAL PRIMARY KEY,
+    "time_stamp" TIMESTAMP,
+    "client_ip" VARCHAR(512),
+    "user_id" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  ,
+    "origin" VARCHAR(512),
+    "description" TEXT
+);
+success!
+timestamp: 2017-08-11T16:44:21.691158
+CREATE TABLE "auth_cas"(
+    "id" SERIAL PRIMARY KEY,
+    "user_id" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  ,
+    "created_on" TIMESTAMP,
+    "service" VARCHAR(512),
+    "ticket" VARCHAR(512),
+    "renew" CHAR(1)
+);
+success!
+timestamp: 2017-08-11T16:44:21.792076
+CREATE TABLE "center"(
+    "id" SERIAL PRIMARY KEY,
+    "center" VARCHAR(50) NOT NULL UNIQUE,
+    "shortname" VARCHAR(10),
+    "city" VARCHAR(40) NOT NULL,
+    "state_prov" VARCHAR(2),
+    "country" VARCHAR(40),
+    "email" VARCHAR(100),
+    "phone" VARCHAR(15),
+    "contact" VARCHAR(40),
+    "is_active" CHAR(1),
+    "created_on" TIMESTAMP,
+    "created_by" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  ,
+    "modified_on" TIMESTAMP,
+    "modified_by" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  
+);
+success!
+timestamp: 2017-08-11T16:44:21.891993
+CREATE TABLE "guest"(
+    "id" SERIAL PRIMARY KEY,
+    "center" INTEGER REFERENCES "center" ("id") ON DELETE CASCADE  NOT NULL ,
+    "enrollment" VARCHAR(9),
+    "name" VARCHAR(50) NOT NULL,
+    "name_sa" VARCHAR(512),
+    "id_card" VARCHAR(40),
+    "gender" VARCHAR(1),
+    "birthday" DATE,
+    "city" VARCHAR(40),
+    "state_prov" VARCHAR(2),
+    "country" VARCHAR(30),
+    "aspect" VARCHAR(512),
+    "email" VARCHAR(100),
+    "cell_phone" VARCHAR(15),
+    "sos_contact" VARCHAR(50),
+    "sos_phone" VARCHAR(15),
+    "credit" NUMERIC(7,2),
+    "ps" TEXT,
+    "is_active" CHAR(1),
+    "created_on" TIMESTAMP,
+    "created_by" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  ,
+    "modified_on" TIMESTAMP,
+    "modified_by" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  
+);
+success!
+timestamp: 2017-08-11T16:44:21.997305
+CREATE TABLE "credit_log"(
+    "id" SERIAL PRIMARY KEY,
+    "guesid" INTEGER REFERENCES "guest" ("id") ON DELETE CASCADE  NOT NULL ,
+    "credit" NUMERIC(7,2),
+    "oper" VARCHAR(4),
+    "credit_log" VARCHAR(250),
+    "is_active" CHAR(1),
+    "created_on" TIMESTAMP,
+    "created_by" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  ,
+    "modified_on" TIMESTAMP,
+    "modified_by" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  
+);
+success!
+timestamp: 2017-08-11T16:44:22.059029
+CREATE TABLE "building"(
+    "id" SERIAL PRIMARY KEY,
+    "center" INTEGER REFERENCES "center" ("id") ON DELETE CASCADE  NOT NULL ,
+    "building" VARCHAR(30) NOT NULL,
+    "description" TEXT,
+    "is_active" CHAR(1)
+);
+success!
+timestamp: 2017-08-11T16:44:22.172150
+CREATE TABLE "bedroom"(
+    "id" SERIAL PRIMARY KEY,
+    "builid" INTEGER REFERENCES "building" ("id") ON DELETE CASCADE  NOT NULL ,
+    "bedroom" VARCHAR(20),
+    "gender" VARCHAR(1),
+    "floor_room" INTEGER,
+    "beds" INTEGER,
+    "top_bunks" INTEGER,
+    "is_active" CHAR(1)
+);
+success!
+timestamp: 2017-08-11T16:44:22.246530
+CREATE TABLE "activities"(
+    "id" SERIAL PRIMARY KEY,
+    "activity" VARCHAR(40),
+    "activity_type" VARCHAR(3)
+);
+success!
+timestamp: 2017-08-11T16:44:22.327717
+CREATE TABLE "events"(
+    "id" SERIAL PRIMARY KEY,
+    "center" INTEGER REFERENCES "center" ("id") ON DELETE CASCADE  NOT NULL ,
+    "activity" INTEGER REFERENCES "activities" ("id") ON DELETE CASCADE  NOT NULL ,
+    "description" TEXT,
+    "reg_deadline" TIMESTAMP NOT NULL,
+    "start_date" DATE NOT NULL,
+    "end_date" DATE NOT NULL,
+    "ref_value" NUMERIC(7,2),
+    "min_value" NUMERIC(7,2),
+    "status" VARCHAR(3),
+    "is_active" CHAR(1),
+    "created_on" TIMESTAMP,
+    "created_by" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  ,
+    "modified_on" TIMESTAMP,
+    "modified_by" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  
+);
+success!
+timestamp: 2017-08-11T16:44:22.438614
+CREATE TABLE "bank_flag"(
+    "id" SERIAL PRIMARY KEY,
+    "name" VARCHAR(15) NOT NULL
+);
+success!
+timestamp: 2017-08-11T16:44:22.515484
+CREATE TABLE "payment_form"(
+    "id" SERIAL PRIMARY KEY,
+    "evenid" INTEGER REFERENCES "events" ("id") ON DELETE CASCADE  ,
+    "centid" INTEGER REFERENCES "center" ("id") ON DELETE CASCADE  ,
+    "pay_type" VARCHAR(3),
+    "bank_flag" INTEGER REFERENCES "bank_flag" ("id") ON DELETE CASCADE  ,
+    "num_ctrl" VARCHAR(50),
+    "guesid" INTEGER REFERENCES "guest" ("id") ON DELETE CASCADE  ,
+    "amount" NUMERIC(7,2),
+    "guests" TEXT,
+    "credit" CHAR(1),
+    "late" CHAR(1),
+    "cancel" CHAR(1),
+    "is_active" CHAR(1),
+    "created_on" TIMESTAMP,
+    "created_by" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  ,
+    "modified_on" TIMESTAMP,
+    "modified_by" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  
+);
+success!
+timestamp: 2017-08-11T16:44:22.654150
+CREATE TABLE "register"(
+    "id" SERIAL PRIMARY KEY,
+    "evenid" INTEGER REFERENCES "events" ("id") ON DELETE CASCADE  ,
+    "guesid" INTEGER REFERENCES "guest" ("id") ON DELETE CASCADE  ,
+    "lodge" VARCHAR(512),
+    "no_stairs" CHAR(1),
+    "no_top_bunk" CHAR(1),
+    "arrival_date" VARCHAR(2),
+    "arrival_time" VARCHAR(2),
+    "bedroom" INTEGER REFERENCES "bedroom" ("id") ON DELETE CASCADE  ,
+    "housed" CHAR(1),
+    "staff" VARCHAR(3),
+    "ps" TEXT,
+    "amount" NUMERIC(7,2),
+    "multiple" CHAR(1),
+    "credit" CHAR(1),
+    "late" CHAR(1),
+    "payforms" TEXT,
+    "is_active" CHAR(1),
+    "created_on" TIMESTAMP,
+    "created_by" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  ,
+    "modified_on" TIMESTAMP,
+    "modified_by" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  
+);
+success!
+timestamp: 2017-08-11T16:44:22.776241
+CREATE TABLE "register_payment_form"(
+    "id" SERIAL PRIMARY KEY,
+    "evenid" INTEGER REFERENCES "events" ("id") ON DELETE CASCADE  ,
+    "regid" INTEGER REFERENCES "register" ("id") ON DELETE CASCADE  ,
+    "payfid" INTEGER REFERENCES "payment_form" ("id") ON DELETE CASCADE  
+);
+success!
+timestamp: 2017-08-11T16:44:22.849296
+CREATE TABLE "guest_stay"(
+    "id" SERIAL PRIMARY KEY,
+    "guesid" INTEGER REFERENCES "guest" ("id") ON DELETE CASCADE  NOT NULL ,
+    "center" INTEGER REFERENCES "center" ("id") ON DELETE CASCADE  NOT NULL ,
+    "lodge" VARCHAR(512),
+    "no_stairs" CHAR(1),
+    "no_top_bunk" CHAR(1),
+    "arrival_date" VARCHAR(2),
+    "arrival_time" VARCHAR(2),
+    "bedroom" INTEGER REFERENCES "bedroom" ("id") ON DELETE CASCADE  ,
+    "staff" VARCHAR(3),
+    "ps" TEXT
+);
+success!
+timestamp: 2017-08-11T16:44:22.949083
+CREATE TABLE "bedrooms_mapping"(
+    "id" SERIAL PRIMARY KEY,
+    "centid" INTEGER REFERENCES "center" ("id") ON DELETE CASCADE  NOT NULL ,
+    "evenid" INTEGER REFERENCES "events" ("id") ON DELETE CASCADE  NOT NULL ,
+    "bedrooms" JSON,
+    "is_active" CHAR(1),
+    "created_on" TIMESTAMP,
+    "created_by" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  ,
+    "modified_on" TIMESTAMP,
+    "modified_by" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  
+);
+success!
+timestamp: 2018-03-03T04:26:00.167865
+ALTER TABLE "guest_stay" ADD "bedroom_alt" INTEGER REFERENCES "bedroom" ("id") ON DELETE CASCADE  ;
+faked!
+timestamp: 2018-03-03T04:26:00.197757
+ALTER TABLE "guest_stay" ADD "description" TEXT;
+faked!
+success!
+timestamp: 2018-03-03T17:23:33.278627
+ALTER TABLE "register" ADD "description" TEXT;
+faked!
+success!
+timestamp: 2022-10-15T13:40:35.057226
+CREATE TABLE "auth_user"(
+    "id" SERIAL PRIMARY KEY,
+    "first_name" VARCHAR(128),
+    "last_name" VARCHAR(128),
+    "email" VARCHAR(512),
+    "password" VARCHAR(512),
+    "registration_key" VARCHAR(512),
+    "reset_password_key" VARCHAR(512),
+    "registration_id" VARCHAR(512),
+    "center" INTEGER
+);
+faked!
+timestamp: 2022-10-15T13:40:35.058167
+CREATE TABLE "auth_group"(
+    "id" SERIAL PRIMARY KEY,
+    "role" VARCHAR(512),
+    "description" TEXT
+);
+faked!
+timestamp: 2022-10-15T13:40:35.059240
+CREATE TABLE "auth_membership"(
+    "id" SERIAL PRIMARY KEY,
+    "user_id" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  ,
+    "group_id" INTEGER REFERENCES "auth_group" ("id") ON DELETE CASCADE  
+);
+faked!
+timestamp: 2022-10-15T13:40:35.060007
+CREATE TABLE "auth_permission"(
+    "id" SERIAL PRIMARY KEY,
+    "group_id" INTEGER REFERENCES "auth_group" ("id") ON DELETE CASCADE  ,
+    "name" VARCHAR(512),
+    "table_name" VARCHAR(512),
+    "record_id" INTEGER
+);
+faked!
+timestamp: 2022-10-15T13:40:35.060814
+CREATE TABLE "auth_event"(
+    "id" SERIAL PRIMARY KEY,
+    "time_stamp" TIMESTAMP,
+    "client_ip" VARCHAR(512),
+    "user_id" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  ,
+    "origin" VARCHAR(512),
+    "description" TEXT
+);
+faked!
+timestamp: 2022-10-15T13:40:35.061581
+CREATE TABLE "auth_cas"(
+    "id" SERIAL PRIMARY KEY,
+    "user_id" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  ,
+    "created_on" TIMESTAMP,
+    "service" VARCHAR(512),
+    "ticket" VARCHAR(512),
+    "renew" CHAR(1)
+);
+faked!
+timestamp: 2022-10-15T13:42:08.306551
+CREATE TABLE "center"(
+    "id" SERIAL PRIMARY KEY,
+    "center" VARCHAR(50) NOT NULL UNIQUE,
+    "shortname" VARCHAR(10),
+    "city" VARCHAR(40) NOT NULL,
+    "state_prov" VARCHAR(2),
+    "country" VARCHAR(40),
+    "email" VARCHAR(100),
+    "phone" VARCHAR(15),
+    "contact" VARCHAR(40),
+    "is_active" CHAR(1),
+    "created_on" TIMESTAMP,
+    "created_by" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  ,
+    "modified_on" TIMESTAMP,
+    "modified_by" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  
+);
+faked!
+timestamp: 2022-10-15T13:42:08.310681
+CREATE TABLE "guest"(
+    "id" SERIAL PRIMARY KEY,
+    "center" INTEGER REFERENCES "center" ("id") ON DELETE CASCADE  NOT NULL ,
+    "enrollment" VARCHAR(9),
+    "name" VARCHAR(50) NOT NULL,
+    "name_sa" VARCHAR(512),
+    "id_card" VARCHAR(40),
+    "gender" VARCHAR(1),
+    "birthday" DATE,
+    "city" VARCHAR(40),
+    "state_prov" VARCHAR(2),
+    "country" VARCHAR(30),
+    "aspect" VARCHAR(512),
+    "email" VARCHAR(100),
+    "cell_phone" VARCHAR(15),
+    "sos_contact" VARCHAR(50),
+    "sos_phone" VARCHAR(15),
+    "credit" NUMERIC(7,2),
+    "ps" TEXT,
+    "is_active" CHAR(1),
+    "created_on" TIMESTAMP,
+    "created_by" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  ,
+    "modified_on" TIMESTAMP,
+    "modified_by" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  
+);
+faked!
+timestamp: 2022-10-15T13:42:08.313323
+CREATE TABLE "credit_log"(
+    "id" SERIAL PRIMARY KEY,
+    "guesid" INTEGER REFERENCES "guest" ("id") ON DELETE CASCADE  NOT NULL ,
+    "credit" NUMERIC(7,2),
+    "oper" VARCHAR(4),
+    "credit_log" VARCHAR(250),
+    "is_active" CHAR(1),
+    "created_on" TIMESTAMP,
+    "created_by" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  ,
+    "modified_on" TIMESTAMP,
+    "modified_by" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  
+);
+faked!
+timestamp: 2022-10-15T13:42:08.315112
+CREATE TABLE "building"(
+    "id" SERIAL PRIMARY KEY,
+    "center" INTEGER REFERENCES "center" ("id") ON DELETE CASCADE  NOT NULL ,
+    "building" VARCHAR(30) NOT NULL,
+    "description" TEXT,
+    "is_active" CHAR(1)
+);
+faked!
+timestamp: 2022-10-15T13:42:08.317084
+CREATE TABLE "bedroom"(
+    "id" SERIAL PRIMARY KEY,
+    "builid" INTEGER REFERENCES "building" ("id") ON DELETE CASCADE  NOT NULL ,
+    "bedroom" VARCHAR(20),
+    "gender" VARCHAR(1),
+    "floor_room" INTEGER,
+    "beds" INTEGER,
+    "top_bunks" INTEGER,
+    "is_active" CHAR(1)
+);
+faked!
+timestamp: 2022-10-15T13:42:08.318463
+CREATE TABLE "activities"(
+    "id" SERIAL PRIMARY KEY,
+    "activity" VARCHAR(40),
+    "activity_type" VARCHAR(3)
+);
+faked!
+timestamp: 2022-10-15T13:42:08.321491
+CREATE TABLE "events"(
+    "id" SERIAL PRIMARY KEY,
+    "center" INTEGER REFERENCES "center" ("id") ON DELETE CASCADE  NOT NULL ,
+    "activity" INTEGER REFERENCES "activities" ("id") ON DELETE CASCADE  NOT NULL ,
+    "description" TEXT,
+    "reg_deadline" TIMESTAMP NOT NULL,
+    "start_date" DATE NOT NULL,
+    "end_date" DATE NOT NULL,
+    "ref_value" NUMERIC(7,2),
+    "min_value" NUMERIC(7,2),
+    "status" VARCHAR(3),
+    "is_active" CHAR(1),
+    "created_on" TIMESTAMP,
+    "created_by" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  ,
+    "modified_on" TIMESTAMP,
+    "modified_by" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  
+);
+faked!
+timestamp: 2022-10-15T13:42:08.322968
+CREATE TABLE "bank_flag"(
+    "id" SERIAL PRIMARY KEY,
+    "name" VARCHAR(15) NOT NULL
+);
+faked!
+timestamp: 2022-10-15T13:42:08.326193
+CREATE TABLE "payment_form"(
+    "id" SERIAL PRIMARY KEY,
+    "evenid" INTEGER REFERENCES "events" ("id") ON DELETE CASCADE  ,
+    "centid" INTEGER REFERENCES "center" ("id") ON DELETE CASCADE  ,
+    "pay_type" VARCHAR(3),
+    "bank_flag" INTEGER REFERENCES "bank_flag" ("id") ON DELETE CASCADE  ,
+    "num_ctrl" VARCHAR(50),
+    "guesid" INTEGER REFERENCES "guest" ("id") ON DELETE CASCADE  ,
+    "amount" NUMERIC(7,2),
+    "guests" TEXT,
+    "credit" CHAR(1),
+    "late" CHAR(1),
+    "cancel" CHAR(1),
+    "is_active" CHAR(1),
+    "created_on" TIMESTAMP,
+    "created_by" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  ,
+    "modified_on" TIMESTAMP,
+    "modified_by" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  
+);
+faked!
+timestamp: 2022-10-15T13:42:08.330322
+CREATE TABLE "register"(
+    "id" SERIAL PRIMARY KEY,
+    "evenid" INTEGER REFERENCES "events" ("id") ON DELETE CASCADE  ,
+    "guesid" INTEGER REFERENCES "guest" ("id") ON DELETE CASCADE  ,
+    "lodge" VARCHAR(512),
+    "no_stairs" CHAR(1),
+    "no_top_bunk" CHAR(1),
+    "arrival_date" VARCHAR(2),
+    "arrival_time" VARCHAR(2),
+    "bedroom" INTEGER REFERENCES "bedroom" ("id") ON DELETE CASCADE  ,
+    "housed" CHAR(1),
+    "staff" VARCHAR(3),
+    "description" TEXT,
+    "ps" TEXT,
+    "amount" NUMERIC(7,2),
+    "multiple" CHAR(1),
+    "credit" CHAR(1),
+    "late" CHAR(1),
+    "payforms" TEXT,
+    "is_active" CHAR(1),
+    "created_on" TIMESTAMP,
+    "created_by" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  ,
+    "modified_on" TIMESTAMP,
+    "modified_by" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  
+);
+faked!
+timestamp: 2022-10-15T13:42:08.332315
+CREATE TABLE "register_payment_form"(
+    "id" SERIAL PRIMARY KEY,
+    "evenid" INTEGER REFERENCES "events" ("id") ON DELETE CASCADE  ,
+    "regid" INTEGER REFERENCES "register" ("id") ON DELETE CASCADE  ,
+    "payfid" INTEGER REFERENCES "payment_form" ("id") ON DELETE CASCADE  
+);
+faked!
+timestamp: 2022-10-15T13:42:08.334922
+CREATE TABLE "guest_stay"(
+    "id" SERIAL PRIMARY KEY,
+    "guesid" INTEGER REFERENCES "guest" ("id") ON DELETE CASCADE  NOT NULL ,
+    "center" INTEGER REFERENCES "center" ("id") ON DELETE CASCADE  NOT NULL ,
+    "lodge" VARCHAR(512),
+    "no_stairs" CHAR(1),
+    "no_top_bunk" CHAR(1),
+    "arrival_date" VARCHAR(2),
+    "arrival_time" VARCHAR(2),
+    "bedroom" INTEGER REFERENCES "bedroom" ("id") ON DELETE CASCADE  ,
+    "bedroom_alt" INTEGER REFERENCES "bedroom" ("id") ON DELETE CASCADE  ,
+    "staff" VARCHAR(3),
+    "description" TEXT,
+    "ps" TEXT
+);
+faked!
+timestamp: 2022-10-15T13:42:08.337465
+CREATE TABLE "bedrooms_mapping"(
+    "id" SERIAL PRIMARY KEY,
+    "centid" INTEGER REFERENCES "center" ("id") ON DELETE CASCADE  NOT NULL ,
+    "evenid" INTEGER REFERENCES "events" ("id") ON DELETE CASCADE  NOT NULL ,
+    "bedrooms" JSON,
+    "is_active" CHAR(1),
+    "created_on" TIMESTAMP,
+    "created_by" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  ,
+    "modified_on" TIMESTAMP,
+    "modified_by" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  
+);
+faked!

@@ -1,0 +1,67 @@
+{{extend 'layout.html'}}
+
+{{block header}}
+<h3>{{=T('locate payment form')}}</h3>
+{{end}}
+
+{{block control_menu}}
+<div class="btn-group" role="group">
+  <button type="button"
+          class="btn btn-info navbar-btn"
+          onclick="window.open('{{=URL('default', 'index')}}', '_self')">
+    <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+  </button>
+</div>
+{{end}}
+
+<div class="row">
+  <div class="col-sm-3">
+    {{=search}}
+  </div>
+  <div class="col-sm-9">
+    {{if results:}}
+    <table class="table table-condensed table-hover" style="font-family:monospace; font-size: 9pt;">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>{{=T('date')}}</th>
+          <th>{{=T('event')}}</th>
+          <th>{{=T('type')}}</th>
+          <th>{{=T('bank/flag')}}</th>
+          <th>{{=T('control')}}</th>
+          <th class="text-right">{{=T('amount')}} $</th>
+        </tr>
+      </thead>
+      <tbody>
+      {{for n, res in enumerate(results):}}
+      {{num = res.register_payment_form.select(db.register_payment_form.regid).first()}}
+        <tr data-toggle="modal" data-target="#confirm" onclick="regInfo({{=num.regid}});">
+          <th>{{=n+1}}</th>
+          <td>{{=res.evenid.start_date.strftime('%Y/%B')}}</td>
+          <td>{{=res.evenid.activity.activity}} - {{=res.evenid.center.shortname}}</td>
+          <td>{{=PAYMENT_TYPES[res.pay_type].upper()}}</td>
+          <td>{{=res.bank_flag.name if res.bank_flag else ''}}</td>
+          <td>{{=res.num_ctrl if res.num_ctrl else ''}}</td>
+          <td class="text-right">{{=res.amount}}</td>
+        </tr>
+      {{pass}}
+      </tbody>
+    </table>
+    {{pass}}
+  </div>
+</div>
+
+<div id="confirm" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"></div>
+
+<style type="text/css">
+div .table {
+  font-family: monospace;
+  font-size: 10pt;
+}
+</style>
+
+<script type="text/javascript">
+function regInfo(gid){
+  ajax("{{=URL('reports', 'register_info')}}/"+gid, [], 'confirm');
+}
+</script>

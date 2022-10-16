@@ -1,0 +1,119 @@
+{{extend 'layout-print-ls.html'}}
+
+{{block header}}
+<h3>
+  {{=T('total by centers')}}&nbsp;&nbsp;&nbsp;
+  <small><b>{{=T('event')}}:</b> {{=event.activity.activity}} - {{=event.center.shortname}} {{=event.start_date.strftime('%b/%Y')}}</small>
+</h3>
+{{end}}
+
+<br />
+<div class="row">
+  <div class="col-sm-12">
+    {{TOTAL_GERAL = 0}}
+    {{for _center in centers:}}
+    <table class="table table-condensed">
+      <caption><h4>{{=_center.center}}</h4></caption>
+      <tr>
+        <th>{{=T('type of payment')}}</th>
+        <th class="text-center">{{=T('enrollments')}}</th>
+        <th class="text-right">payed $</th>
+        <th class="text-right">expected $</th>
+        <th class="text-right">diference $</th>
+      </tr>
+      {{if _center.full:}}
+      <tr>
+        <th>PAGAMENTOS REGULARES</th>
+        <th class="text-center"><span class="badge">{{=_center.full}}</span></th>
+        <th class="text-right text-{{='primary' if _center.full_payed >= _center.full_expected else 'danger'}}">
+          {{='%1.2f' % _center.full_payed}}
+        </th>
+        <th class="text-right">{{='%1.2f' % _center.full_expected}}</th>
+        <th class="text-right text-{{='primary' if (_center.full_payed - _center.full_expected) > 0. else 'danger'}}">
+          {{='%1.2f' % (_center.full_payed - _center.full_expected) if (_center.full_payed - _center.full_expected) != 0 else ''}}
+        </th>
+      </tr>
+      {{pass}}
+      {{if _center.half:}}
+      <tr>
+        <th>DESCONTO DE 50%</th>
+        <th class="text-center"><span class="badge">{{=_center.half}}</span></th>
+        <th class="text-right text-{{='primary' if _center.half_payed >= _center.half_expected else 'danger'}}">
+          {{='%1.2f' % _center.half_payed}}
+        </th>
+        <th class="text-right">{{='%1.2f' % _center.half_expected}}</th>
+        <th class="text-right text-{{='primary' if (_center.half_payed - _center.half_expected) > 0. else 'danger'}}">
+          {{='%1.2f' % (_center.half_payed - _center.half_expected) if (_center.half_payed - _center.half_expected) != 0 else ''}}
+        </th>
+      </tr>
+      {{pass}}
+      {{if _center.free:}}
+      <tr>
+        <th>ISENTOS</th>
+        <th class="text-center"><span class="badge">{{=_center.free}}</span></th>
+        <th class="text-right text-{{='primary' if _center.free_payed > _center.free_expected else 'default'}}">
+          {{='%1.2f' % _center.free_payed}}
+        </th>
+        <th class="text-right">{{='%1.2f' % _center.free_expected}}</th>
+        <th class="text-right text-{{='primary' if (_center.free_payed - _center.free_expected) > 0. else 'default'}}">
+          {{='%1.2f' % (_center.free_payed - _center.free_expected)}}
+        </th>
+      </tr>
+      {{pass}}
+      {{if _center.pgst:}}
+      <tr>
+        <th>CONVIDADOS</th>
+        {{_center.pgst_expected = _center.pgst_payed}}
+        <th class="text-center"><span class="badge">{{=_center.pgst}}</span></th>
+        <th class="text-right text-{{='primary' if _center.pgst_payed > 0. else 'default'}}">
+          {{='%1.2f' % _center.pgst_payed}}
+        </th>
+        <th class="text-right">{{='%1.2f' % _center.pgst_expected}}</th>
+        <th class="text-right text-default">
+          {{='%1.2f' % 0.}}
+        </th>
+      </tr>
+      {{pass}}
+      <tr style="font-size: 14pt;">
+        <th class="text-right">TOTAL</th>
+        <th class="text-center"><span class="badge">{{=_center.full + _center.half + _center.free + _center.pgst}}</span></th>
+          {{
+            TOTAL_PAYED = _center.full_payed + _center.half_payed + _center.free_payed + _center.pgst_payed
+            TOTAL_EXPECTED = _center.full_expected + _center.half_expected + _center.pgst_expected
+            TOTAL_GERAL += TOTAL_EXPECTED
+          }}
+        <th class="text-right text-{{='primary' if TOTAL_PAYED >= TOTAL_EXPECTED else 'danger'}}">
+          {{='%1.2f' % TOTAL_PAYED}}
+        </th>
+        <th class="text-right">
+          {{='%1.2f' % TOTAL_EXPECTED}}
+        </th>
+        <th class="text-right text-{{='primary' if (TOTAL_PAYED - TOTAL_EXPECTED) > 0. else 'danger'}}">
+          {{='%1.2f' % (TOTAL_PAYED - TOTAL_EXPECTED) if (TOTAL_PAYED - TOTAL_EXPECTED) != 0 else ''}}
+        </th>
+      </tr>
+    </table>
+    {{pass}}
+    <table class="table table-condensed">
+      <caption><h4>TOTAL A SER RECEBIDO</h4></caption>
+      <tr style="font-size: 16pt;">
+        <th width="82%" class="text-right">TOTAL</th>
+        <th width="18%" class="text-right">{{='%1.2f' % TOTAL_GERAL}}</th>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- modal -->
+<div id="confirm" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"></div>
+
+<style type="text/css">
+div .table {
+  font-family: monospace;
+  font-size: 9pt;
+}
+</style>
+
+<script type="text/javascript">
+function goBack() {history.go(-1)};
+</script>

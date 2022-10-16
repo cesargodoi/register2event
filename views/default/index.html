@@ -1,0 +1,58 @@
+{{extend 'layout.html'}}
+
+{{if auth.has_membership('root') or auth.has_membership('admin') or auth.has_membership('office'):}}
+{{block link_menu}}{{include 'link_menu.html'}}{{end}}
+{{pass}}
+
+{{block header}}
+  {{if rows:}}
+  <h2>inscrições abertas</h2>
+  {{else:}}
+  <h2>nenhum evento</h2>
+  {{pass}}
+{{end}}
+
+{{if rows:}}
+<br>
+<div class="row">
+  <div class="col-sm-12">
+    <div class="list-group">
+      {{for row in rows:}}
+      <li class="row list-group-item" id="{{=row.id}}" onclick="window.open('{{=URL('events','show', vars={'evenid':row.id})}}', '_self')">
+        <div class="col-sm-1 bg-{{='primary' if row.status == 'OPN' else 'danger'}}">
+          <center>
+           <span class="glyphicon glyphicon-folder-{{='open' if row.status == 'OPN' else 'close'}}"
+                 style="font-size:20pt; line-height: 60px;"></span>
+          </center>
+        </div>
+        <div class="col-sm-11">
+          <strong style="font-size:14pt;">{{=row.activity.activity}} - {{=row.start_date.strftime('%B de %Y')}}</strong><br />
+          <div style="font-size:10pt;">
+            <strong>{{=T('place')}}:</strong> <em>{{=center_repr % row.center}}</em><br />
+            {{if row.start_date == row.end_date:
+                period = row.end_date.strftime('%d de %B de %Y')
+              elif row.start_date.strftime('%m') == row.end_date.strftime('%m'):
+                period = 'de %s à %s' % (row.start_date.strftime('%d'),row.end_date.strftime('%d de %B de %Y'))
+              else:
+                period = 'de %s à %s' % (row.start_date.strftime('%d/%m'),row.end_date.strftime('%d/%m de %Y'))
+              pass}}
+            <strong>{{=T('date')}}:</strong> <em>{{=period}}</em>&nbsp;&nbsp;&nbsp;
+            <strong>{{=T('deadline')}}:</strong> <em>{{=row.reg_deadline.strftime('%d/%m/%y %H:%M')}}</em>&nbsp;&nbsp;&nbsp;
+            <strong>{{=T('registration fee')}}:</strong> <em>${{=row.ref_value}}</em><br />
+            {{if row.description:}}
+            <strong>{{=T('description')}}:</strong> <em>{{=row.description}}</em><br>
+            {{pass}}
+            <strong>{{=T('subscriptions')}}:</strong> <span class="label label-primary">{{=row.guests}}</span> <em>{{=T('until now')}}</em>
+        </div>
+      </li>
+      {{pass}}
+    </div>
+  </div>
+</div>
+{{pass}}
+
+<script type="text/javascript">
+function bkp(){
+  ajax("{{=URL('default', 'bkp')}}", [], ':eval');
+}
+</script>

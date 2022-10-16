@@ -1,0 +1,116 @@
+{{extend 'layout.html'}}
+
+{{block header}}
+<div class="row">
+  <div class="col-sm-12">
+    {{
+      onOff = T('active') if building.is_active else T('inactive')
+      onOffCollor = 'primary' if building.is_active else 'warning'
+    }}
+    <h3><strong>{{=building.building}} | {{=center_abbr % building.center}}</strong>&nbsp;&nbsp;
+      <small>{{=building.description}}</small>&nbsp;&nbsp;
+      <span class="label label-{{=onOffCollor}}">{{=onOff}}</span>
+    </h3>
+  </div>
+</div>
+{{end}}
+
+{{block control_menu}}
+  <div class="btn-group" role="group">
+    {{if auth.has_membership('root') or auth.has_membership('admin'):}}
+    <button type="button"
+            class="btn btn-primary"
+            onclick="window.open('{{=URL('bedroom','new_bedroom', vars={'builid':building.id})}}', '_self')">
+      <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+    </button>
+    <button type="button"
+            class="btn btn-warning"
+            onclick="window.open('{{=URL('edit_building', vars={'builid':building.id})}}', '_self')">
+      <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+    </button>
+    <button type="button"
+            class="btn btn-danger"
+            onclick="delBuilding({{=building.id}},{{=building.center}})">
+      <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+    </button>
+    {{pass}}
+    <button type="button"
+            class="btn btn-info"
+            onclick="window.open('{{=URL('list_buildings')}}', '_self')">
+      <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+    </button>
+  </div>
+{{end}}
+
+{{block link_menu}}
+{{end}}
+
+<div class="row">
+  <div class="col-sm-12">
+    {{if list_of_bedrooms['male']:
+        bedrooms, beds, tops = 0, 0, 0
+        for male in list_of_bedrooms['male']:
+           bedrooms += 1
+           beds += male['beds']
+           tops += male['top_bunks']
+        pass}}
+    <div class="bs-callout bs-callout-info"
+         onclick="window.open('{{=URL('bedroom', 'list_bedrooms_by_gender', vars={'builid':building.id, 'gender': 'M'})}}', '_self')">
+      <h4>{{=T('male accommodation')}}</h4>
+      <span class="label label-default">{{=bedrooms}}</span> {{=T('bedrooms')}} &nbsp;&nbsp;|&nbsp;&nbsp;
+      <span class="label label-default">{{=beds}}</span> {{=T('beds')}} &nbsp;+&nbsp;
+      <span class="label label-default">{{=tops}}</span> {{=T('top bunks')}} &nbsp;&nbsp;=&nbsp;&nbsp;
+      <span class="label label-default">{{=(beds+tops)}}</span> {{=T('vacancies')}}
+    </div>
+    {{pass}}
+    {{if list_of_bedrooms['fema']:
+        bedrooms, beds, tops = 0, 0, 0
+        for fema in list_of_bedrooms['fema']:
+           bedrooms += 1
+           beds += fema['beds']
+           tops += fema['top_bunks']
+        pass}}
+        <div class="bs-callout bs-callout-warning"
+             onclick="window.open('{{=URL('bedroom', 'list_bedrooms_by_gender', vars={'builid':building.id, 'gender': 'F'})}}', '_self')">
+      <h4>{{=T('female accommodation')}}</h4>
+      <span class="label label-default">{{=bedrooms}}</span> {{=T('bedrooms')}} &nbsp;&nbsp;|&nbsp;&nbsp;
+      <span class="label label-default">{{=beds}}</span> {{=T('beds')}} &nbsp;+&nbsp;
+      <span class="label label-default">{{=tops}}</span> {{=T('top bunks')}} &nbsp;&nbsp;=&nbsp;&nbsp;
+      <span class="label label-default">{{=(beds+tops)}}</span> {{=T('vacancies')}}
+    </div>
+    {{pass}}
+    {{if list_of_bedrooms['mixd']:
+        bedrooms, beds, tops = 0, 0, 0
+        for mixd in list_of_bedrooms['mixd']:
+           bedrooms += 1
+           beds += mixd['beds']
+           tops += mixd['top_bunks']
+        pass}}
+        <div class="bs-callout bs-callout-default"
+             onclick="window.open('{{=URL('bedroom', 'list_bedrooms_by_gender', vars={'builid':building.id, 'gender': 'X'})}}', '_self')">
+      <h4>{{=T('mixed accommodation')}}</h4>
+      <span class="label label-default">{{=bedrooms}}</span> {{=T('bedrooms')}} &nbsp;&nbsp;|&nbsp;&nbsp;
+      <span class="label label-default">{{=beds}}</span> {{=T('beds')}} &nbsp;+&nbsp;
+      <span class="label label-default">{{=tops}}</span> {{=T('top bunks')}} &nbsp;&nbsp;=&nbsp;&nbsp;
+      <span class="label label-default">{{=(beds+tops)}}</span> {{=T('vacancies')}}
+    </div>
+    {{pass}}
+  </div>
+</div>
+
+<div id="confirm" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"></div>
+
+<style type="text/css">
+div .table {
+  font-family: monospace;
+  font-size: 10pt;
+}
+</style>
+
+<script type="text/javascript">
+function delBuilding(bid,cid){
+  if (confirm("{{=T('Are you sure')}}?")) {
+     ajax(`{{=URL('delete_building')}}?builid=${bid}&centid=${cid}`, [], ':eval');
+  }
+}
+</script>

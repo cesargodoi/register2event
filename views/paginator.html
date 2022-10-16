@@ -1,0 +1,15 @@
+<div class="row">
+  <div class="col-md-12">
+    {{if records > len(rows):}}
+    <div style="position:relative;float:left;">
+      {{=XML(paginator)}}
+    </div>
+    {{pass}}   
+    <div style="position:relative;float:right; margin-top: 16px; text-align: right;">
+      {{if records > len(rows):}}
+        {{=paginate_selector}}
+      {{pass}}
+      {{=paginate_info}}
+    </div>    
+  </div>
+</div>
