@@ -27,13 +27,10 @@ def cash_balance():
     form.element("button")["_class"] = "btn btn-success btn-lg"
     form.element(_type="submit")["_class"] = "btn btn-primary btn-lg"
     form.element(_type="submit")["_onclick"] = (
-        "dayBalance(document.getElementById('no_table_days').value,%s);"
-        % event.id
+        "dayBalance(document.getElementById('no_table_days').value,%s);" % event.id
     )
     if form.process().accepted:
-        redirect(
-            URL("reports", "show_cash_balance", vars=dict(**request.vars))
-        )
+        redirect(URL("reports", "show_cash_balance", vars=dict(**request.vars)))
     return dict(form=form)
 
 
@@ -197,9 +194,7 @@ def payment_by_guest():
         if gsc:
             GSCs.append(gsc)
         _gsc = [
-            (int(pf.id), float(pf.amount), pf.credit)
-            for pf in payforms
-            if pf.credit
+            (int(pf.id), float(pf.amount), pf.credit) for pf in payforms if pf.credit
         ]
         if _gsc:
             GSCs.append(_gsc)
@@ -253,9 +248,7 @@ def register_info():
     payforms, registers = read.payforms, read.registers
     guests, pays = [], []
     title = (
-        T("credit launch details")
-        if registers[0].credit
-        else T("subscription details")
+        T("credit launch details") if registers[0].credit else T("subscription details")
     )
     for n, reg in enumerate(registers):
         num = n + 1
@@ -387,9 +380,7 @@ def locate_payment_form():
                 ctrl = "%%%s%%" % request.vars.ctrl.lower()
                 queries.append((Payment_Form.num_ctrl.lower().like(ctrl)))
             if request.vars.amount:
-                queries.append(
-                    (Payment_Form.amount == float(request.vars.amount))
-                )
+                queries.append((Payment_Form.amount == float(request.vars.amount)))
             query = reduce(lambda a, b: (a & b), queries)
             results = db(query).select()
             return dict(search=search, results=results)
@@ -415,9 +406,7 @@ def summary_to_print():
         if reg.is_active and not reg.credit:
             stay_dict = dict(
                 payforms=[
-                    pf.pay_type
-                    for pf in payment_form
-                    if reg.guesid in pf.guests
+                    pf.pay_type for pf in payment_form if reg.guesid in pf.guests
                 ],
                 guesid=reg.guesid,
                 name=reg.guesid.name,
@@ -447,9 +436,7 @@ def to_stn():
     response.view = "reports/link.html"
     evenid = request.vars.evenid
     event = Events[evenid]
-    regists = db(
-        (Register.evenid == evenid) & (Register.credit == False)
-    ).select()
+    regists = db((Register.evenid == evenid) & (Register.credit == False)).select()
     registers = [r for r in regists if r.guesid.center == auth.user.center]
     pupils = []
     for r in sorted(registers, key=lambda k: k.guesid.name_sa):
@@ -489,9 +476,7 @@ def frequencies():
     response.view = "reports/link.html"
     evenid = request.vars.evenid
     event = Events[evenid]
-    regists = db(
-        (Register.evenid == evenid) & (Register.credit == False)
-    ).select()
+    regists = db((Register.evenid == evenid) & (Register.credit == False)).select()
     registers = [r for r in regists if r.guesid.center == auth.user.center]
     pupils, guests = [], []
     for r in sorted(registers, key=lambda k: k.guesid.name_sa):
@@ -549,7 +534,8 @@ def guests_per_bedroom():
         r.name = r.guesid.name
         r.name_sa = r.guesid.name_sa
         if r.lodge == "LDG":
-            _lodge = filter(lambda x: x[0] == r.guesid, bedrooms)
+            # _lodge = filter(lambda x: x[0] == r.guesid, bedrooms)
+            _lodge = [x for x in bedrooms if x[0] == r.guesid]
             if _lodge:
                 building = Bedroom[_lodge[0][1]]
                 r.bedroom_details = (
@@ -583,7 +569,8 @@ def map_of_bedrooms():
     for r in registers:
         r.name = r.guesid.name
         r.name_sa = r.guesid.name_sa
-        _lodge = filter(lambda x: x[0] == r.guesid, bedrooms)
+        r.bedroom = r.bedroom or 0
+        _lodge = [x for x in bedrooms if x[0] == r.guesid]
         if _lodge:
             building = Bedroom[_lodge[0][1]]
             r.bedroom_details = (
@@ -594,7 +581,7 @@ def map_of_bedrooms():
             bedrooms.remove(_lodge[0])
         else:
             r.bedroom_details = "not_lodge"
-    rows = sorted(registers, key=lambda k: k["bedroom"])
+    rows = sorted(registers, key=lambda k: k.bedroom)
 
     return dict(event=event, rows=rows)
 
@@ -604,6 +591,8 @@ def map_of_bedrooms():
 def guests_per_staff():
     event = Events[request.vars.evenid]
     rows = dict_registers(event)
+    for row in rows:
+        row.staff = row.staff or ""
     rows.sort(key=lambda k: k.name_sa)
     rows.sort(key=lambda k: k.staff, reverse=True)
 
@@ -615,6 +604,8 @@ def guests_per_staff():
 def guests_per_aspect():
     event = Events[request.vars.evenid]
     rows = dict_registers(event)
+    for row in rows:
+        row.aspect = row.aspect or ""
     rows.sort(key=lambda k: k.name_sa)
     rows.sort(key=lambda k: k.aspect)
 
@@ -761,12 +752,7 @@ def dict_centers_totals(rows):
     for _id in _ids:
         _rows = [r for r in rows if r.centid == _id]
         _center = None
-        full, half, free, pgst = (
-            0,
-            0,
-            0,
-            0,
-        )
+        full, half, free, pgst = 0, 0, 0, 0
         full_payed, full_expected = 0.0, 0.0
         half_payed, half_expected = 0.0, 0.0
         free_payed, free_expected = 0.0, 0.0
@@ -896,9 +882,7 @@ def guests_per_meals():
 
     return dict(
         event=event,
-        conf_days=conf_days(
-            event.start_date.weekday(), event.end_date.weekday()
-        ),
+        conf_days=conf_days(event.start_date.weekday(), event.end_date.weekday()),
         rows=len(rows),
         meals=meals,
         guests_out=guests_out,

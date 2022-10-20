@@ -2,15 +2,15 @@
 
 # indexes db (postgreSQL)
 
-# db.executesql('CREATE INDEX guest_id_index ON guest USING HASH (id);')
-# db.executesql('CREATE INDEX guest_name_index ON guest USING HASH (name);')
-# db.executesql('CREATE INDEX guest_name_sa_index ON guest USING HASH (name_sa);')
-# db.executesql('CREATE INDEX payment_form_id_index ON payment_form USING HASH (id);')
-# db.executesql('CREATE INDEX payment_form_evenid_index ON payment_form USING HASH (evenid);')
-# db.executesql('CREATE INDEX register_id_index ON register USING HASH (id);')
-# db.executesql('CREATE INDEX register_evenid_index ON register USING HASH (evenid);')
-# db.executesql('CREATE INDEX register_guesid_index ON register USING HASH (guesid);')
-# db.executesql('CREATE INDEX register_payment_form_id_index ON register_payment_form USING HASH (id);')
-# db.executesql('CREATE INDEX register_payment_form_evenid_index ON register_payment_form USING HASH (evenid);')
-# db.executesql('CREATE INDEX register_payment_form_regid_index ON register_payment_form USING HASH (regid);')
-# db.executesql('CREATE INDEX register_payment_form_payfid_index ON register_payment_form USING HASH (payfid);')
+# indexes = [
+#     "CREATE INDEX IF NOT EXISTS guest__indexes ON guest (name, name_sa);",
+#     "CREATE INDEX IF NOT EXISTS payment_form__index ON payment_form (evenid);",
+#     "CREATE INDEX IF NOT EXISTS register__indexes ON register (evenid, guesid);",
+#     "CREATE INDEX IF NOT EXISTS register_payment_form__indexes ON register_payment_form (evenid, regid, payfid);",
+#     "CREATE INDEX IF NOT EXISTS guest_stay__indexes ON guest_stay (guesid, center, bedroom, bedroom_alt);",
+#     "CREATE INDEX IF NOT EXISTS bedroom__index ON bedroom (builid);",
+#     "CREATE INDEX IF NOT EXISTS building__index ON building (center);",
+# ]
+
+# for index in indexes:
+#     db.executesql(index)

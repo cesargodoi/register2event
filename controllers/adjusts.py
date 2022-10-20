@@ -10,7 +10,6 @@
 #         print p
 
 
-
 # @auth.requires_login()
 # @auth.requires(auth.has_membership('root'))
 # def adjust_payforms_by_registers():
@@ -51,7 +50,7 @@
 #     hard_reg = db(Register.id.belongs([358, 359,360])).select(orderby=Register.id)
 #     n = 292
 #     for h in hard_reg:
-#         h.update_record(payforms=[long(n)])
+#         h.update_record(payforms=[int(n)])
 #         n += 1
 #     hard_pf = db(Payment_Form.id.belongs([313, 445, 446, 450, 451])).delete()
 #     print hard_pf
@@ -59,10 +58,9 @@
 #     n2 = 292
 #     for hrpf in hard_reg_pf:
 #         print hrpf.id, n2
-#         hrpf.update_record(payfid=long(n2))
+#         hrpf.update_record(payfid=int(n2))
 #         n2 += 1
 #     print '---------------------- thats right ------------------------'
-
 
 
 # @auth.requires_login()
@@ -407,7 +405,6 @@
 #             print cur_line[3], 'ja inserido'
 #     error_file.close()
 #     print 'well done!'
-
 
 
 # @auth.requires_login()

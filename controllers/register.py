@@ -12,14 +12,11 @@ def guest_selector():
         return ""
     pattern = "%" + request.vars.guest.lower() + "%"
     if auth.has_membership("root") or (
-        auth.has_membership("admin")
-        and auth.user.center == request.vars.centid
+        auth.has_membership("admin") and auth.user.center == request.vars.centid
     ):
         query = Guest.name_sa.lower().like(pattern)
     else:
-        query = Guest.name_sa.lower().like(pattern) & (
-            Guest.center == auth.user.center
-        )
+        query = Guest.name_sa.lower().like(pattern) & (Guest.center == auth.user.center)
     selected = [
         [des(row.name), row.id]
         for row in db(query).select(orderby=Guest.name_sa, limitby=(0, 10))
@@ -124,9 +121,7 @@ def register_step2():
         if PAY.get("FRE"):
             PAY.pop("FRE")
     form = SQLFORM.factory(
-        Field(
-            "ptype", requires=IS_IN_SET(PAY), default="CSH", label=T("type")
-        ),
+        Field("ptype", requires=IS_IN_SET(PAY), default="CSH", label=T("type")),
         Field(
             "bflag",
             requires=IS_EMPTY_OR(IS_IN_DB(db, "bank_flag.id", "%(name)s")),
@@ -169,7 +164,7 @@ def register_step2():
 
 
 def updt_amount():
-    Reg.updt_amount(long(request.vars.guesid), float(request.vars.amount))
+    Reg.updt_amount(int(request.vars.guesid), float(request.vars.amount))
 
 
 def del_guest():
@@ -244,43 +239,11 @@ def conclude():
         if event_type == "SCF":
             is_scf = True
             if guest_stay.bedroom_alt:
-                mapping = (
-                    db(Bedrooms_mapping.evenid == conclude.evenid)
-                    .select(orderby=Bedrooms_mapping.id)
-                    .first()
-                )
-                bedroom = [
-                    m
-                    for m in mapping.bedrooms
-                    if m[0] == guest_stay.bedroom_alt
-                ][0]
-                if gues.guesid not in (bedroom[1] + bedroom[2]):
-                    attempt = bed_or_top(
-                        gues.guesid, guest_stay.no_top_bunk, bedroom
-                    )
-                    if attempt:
-                        mapping.update_record(bedrooms=mapping.bedrooms)
-                    else:
-                        guest_stay.update_record(bedroom_alt=None)
+                try_to_allocate(conclude.evenid, guest_stay, gues, alt=True)
         else:
             is_scf = False
             if guest_stay.bedroom:
-                mapping = (
-                    db(Bedrooms_mapping.evenid == conclude.evenid)
-                    .select(orderby=Bedrooms_mapping.id)
-                    .first()
-                )
-                bedroom = [
-                    m for m in mapping.bedrooms if m[0] == guest_stay.bedroom
-                ][0]
-                if gues.guesid not in (bedroom[1] + bedroom[2]):
-                    attempt = bed_or_top(
-                        gues.guesid, guest_stay.no_top_bunk, bedroom
-                    )
-                    if attempt:
-                        mapping.update_record(bedrooms=mapping.bedrooms)
-                    else:
-                        guest_stay.update_record(bedroom=None)
+                try_to_allocate(conclude.evenid, guest_stay, gues)
         # prepare registers to insert
         new_register = Reg.dict_register(
             conclude, gues, guest_stay, guests, payforms_ids, is_scf
@@ -301,29 +264,51 @@ def conclude():
     redirect(URL("events", "show", vars={"evenid": conclude.evenid}))
 
 
-###############################################################################
-def bed_or_top(guesid, no_top_bunk, bedroom, attempt=False):
-    if no_top_bunk:
-        if 0 in bedroom[1]:
-            bedroom[1].remove(0)
-            bedroom[1].append(guesid)
-            bedroom[1].sort(reverse=True)
-            attempt = True
+# helper try to allocate ######################################################
+def try_to_allocate(evenid, stay, guest, alt=False):
+    mapping = (
+        db(Bedrooms_mapping.evenid == evenid)
+        .select(orderby=Bedrooms_mapping.id)
+        .first()
+    )
+    # choose bedroom or bedroom_alt
+    if alt:
+        bedroom = [m for m in mapping.bedrooms if m[0] == stay.bedroom_alt][0]
     else:
+        bedroom = [m for m in mapping.bedrooms if m[0] == stay.bedroom][0]
+    # checking if the guest can up stairs
+    if stay.no_stairs and bedroom[4] != 0:
+        if alt:
+            stay.update_record(bedroom_alt=None)
+        else:
+            stay.update_record(bedroom=None)
+    # the guest cannot sleep in an upper bed and there is no lower bed
+    elif stay.no_top_bunk and 0 not in bedroom[1]:
+        if alt:
+            stay.update_record(bedroom_alt=None)
+        else:
+            stay.update_record(bedroom=None)
+    # the guest cannot sleep in an upper bed and there is lower bed
+    elif stay.no_top_bunk and 0 in bedroom[1]:
+        bedroom[1].remove(0)
+        bedroom[1].append(guest.guesid)
+        mapping.update_record(bedrooms=mapping.bedrooms)
+    # the guest has no restrictions
+    elif guest.guesid not in (bedroom[1] + bedroom[2]) and 0 in (
+        bedroom[1] + bedroom[2]
+    ):
         if 0 in bedroom[2]:
             bedroom[2].remove(0)
-            bedroom[2].append(guesid)
-            bedroom[2].sort(reverse=True)
-            attempt = True
+            bedroom[2].append(guest.guesid)
         elif 0 in bedroom[1]:
             bedroom[1].remove(0)
-            bedroom[1].append(guesid)
-            bedroom[1].sort(reverse=True)
-            attempt = True
-    return attempt
-
-
-###############################################################################
+            bedroom[1].append(guest.guesid)
+        mapping.update_record(bedrooms=mapping.bedrooms)
+    else:
+        if alt:
+            stay.update_record(bedroom_alt=None)
+        else:
+            stay.update_record(bedroom=None)
 
 
 # edit stay
@@ -529,13 +514,9 @@ def unenroll_verify():
     else:
         # tratando de pagamentos regulares #########################################################
         payforms = db(Payment_Form.id.belongs(reg.payforms)).select()
-        dict_pf = {
-            n: (p.pay_type, p.guesid, p.amount) for n, p in enumerate(payforms)
-        }
+        dict_pf = {n: (p.pay_type, p.guesid, p.amount) for n, p in enumerate(payforms)}
         not_delete = [
-            p.pay_type
-            for p in payforms
-            if p.pay_type in ["DBT", "CDT", "DPT", "TRF"]
+            p.pay_type for p in payforms if p.pay_type in ["DBT", "CDT", "DPT", "TRF"]
         ]
         # verifica se tem credito do hóspede nas formas de pagamento
         if "GSC" in [v[0] for v in dict_pf.values()]:
@@ -669,9 +650,7 @@ def unenroll_generate_credit_gsc():
     db(Register_Payment_Form.payfid.belongs(devol_ids)).delete()
     # ajustar a nova quantia (do valor restante) por hóspede
     old_amount = sum([r.amount for r in read.registers])
-    new_amount = (old_amount - sum([td[1] for td in to_devol])) / len(
-        read.registers
-    )
+    new_amount = (old_amount - sum([td[1] for td in to_devol])) / len(read.registers)
     # ajustar os registros
     # verificar se tem mais de um registro atrelado
     if len(read.registers) > 1:
@@ -705,9 +684,7 @@ def unenroll_generate_credit_gsc():
                 created_by=auth.user.id,
             )
             Reg.update_credit_and_log(r.guesid, r.evenid, new_amount, "GEN")
-        return 'location.href="%s";' % URL(
-            "events", "show", vars={"evenid": evenid}
-        )
+        return 'location.href="%s";' % URL("events", "show", vars={"evenid": evenid})
 
 
 @auth.requires_login()
