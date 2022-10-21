@@ -437,45 +437,45 @@
 #     print('well done!')
 
 
-@auth.requires_login()
-@auth.requires(auth.has_membership("root"))
-def adj_guest_stay_step_1():
-    print("-----  ADJUST GUEST STAY STEP 1  -----")
-    stays = db(Guest_Stay).select()
-    count = 0
-    with open("applications/register2event/stay_refactor.csv", "w") as f:
-        f.write("id,bedroom,bedroom_alt\n")
-        for stay in stays:
-            f.write(f"{stay.id},{stay.bedroom},{stay.bedroom_alt}\n")
-            count += 1
+# @auth.requires_login()
+# @auth.requires(auth.has_membership("root"))
+# def adj_guest_stay_step_1():
+#     print("-----  ADJUST GUEST STAY STEP 1  -----")
+#     stays = db(Guest_Stay).select()
+#     count = 0
+#     with open("applications/register2event/stay_refactor.csv", "w") as f:
+#         f.write("id,bedroom,bedroom_alt\n")
+#         for stay in stays:
+#             f.write(f"{stay.id},{stay.bedroom},{stay.bedroom_alt}\n")
+#             count += 1
 
-    print(f"{count} registros copiados.")
-    print("well done!")
+#     print(f"{count} registros copiados.")
+#     print("well done!")
 
 
-@auth.requires_login()
-@auth.requires(auth.has_membership("root"))
-def adj_guest_stay_step_2():
-    from csv import DictReader
+# @auth.requires_login()
+# @auth.requires(auth.has_membership("root"))
+# def adj_guest_stay_step_2():
+#     from csv import DictReader
 
-    print("-----  ADJUST GUEST STAY STEP 2  -----")
-    count = 0
-    with open("applications/register2event/stay_refactor.csv", "r") as f:
-        csv_dict_reader = DictReader(f)
-        for row in csv_dict_reader:
-            stay = Guest_Stay[row["id"]]
-            print(f"a-> {stay.id} b: {stay.bedroom} ba: {stay.bedroom_alt}")
-            stay.bedroom = (
-                int(row["bedroom"]) if row["bedroom"] != "None" else None
-            )
-            stay.bedroom_alt = (
-                int(row["bedroom_alt"])
-                if row["bedroom_alt"] != "None"
-                else None
-            )
-            stay.update_record()
-            print(f"d-> {stay.id} b: {stay.bedroom} ba: {stay.bedroom_alt}\n")
-            count += 1
+#     print("-----  ADJUST GUEST STAY STEP 2  -----")
+#     count = 0
+#     with open("applications/register2event/stay_refactor.csv", "r") as f:
+#         csv_dict_reader = DictReader(f)
+#         for row in csv_dict_reader:
+#             stay = Guest_Stay[row["id"]]
+#             print(f"a-> {stay.id} b: {stay.bedroom} ba: {stay.bedroom_alt}")
+#             stay.bedroom = (
+#                 int(row["bedroom"]) if row["bedroom"] != "None" else None
+#             )
+#             stay.bedroom_alt = (
+#                 int(row["bedroom_alt"])
+#                 if row["bedroom_alt"] != "None"
+#                 else None
+#             )
+#             stay.update_record()
+#             print(f"d-> {stay.id} b: {stay.bedroom} ba: {stay.bedroom_alt}\n")
+#             count += 1
 
-    print(f"{count} registros copiados.")
-    print("well done!")
+#     print(f"{count} registros copiados.")
+#     print("well done!")

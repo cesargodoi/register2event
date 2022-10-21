@@ -82,7 +82,7 @@ def update_mapping(evenid):
 
 def attempt_deallocation(b, mapping, event):
     bedroom = [m for m in mapping if m[0] == b][0]
-    to_deallocation = filter((lambda x: x != 0), (bedroom[1] + bedroom[2]))
+    to_deallocation = [x for x in bedroom[1] + bedroom[2] if x != 0]
     if to_deallocation:
         for g in to_deallocation:
             register = (
@@ -299,7 +299,7 @@ def choose_a_bed(evenid, guesid, bedroomid, regid, event_type, from_mapp=True):
             guest_stay.update_record(bedroom_alt=bedroomid)
         else:
             guest_stay.update_record(bedroom=bedroomid)
-        if from_mapp:
+        if from_mapp:  # ????????????????????????????????????????????????????
             init_mapp(
                 evenid=evenid,
                 centid=current.session.mapp.centid,

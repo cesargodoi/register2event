@@ -1,4 +1,5 @@
 from datetime import date
+from importlib.metadata import requires
 from gluon.storage import Storage
 
 
@@ -12,7 +13,10 @@ def clear_session():
         del session.register
     if session.mapp or session.mapp == "":
         del session.mapp
-    if session.unenroll_credit_multiple or session.unenroll_credit_multiple == "":
+    if (
+        session.unenroll_credit_multiple
+        or session.unenroll_credit_multiple == ""
+    ):
         del session.unenroll_credit_multiple
 
 
@@ -25,7 +29,9 @@ def read_register(num, pf=False):
         reg = Register[num]
         if not reg:
             return False
-        m2m_rows = db(Register_Payment_Form.payfid.belongs(reg.payforms)).select()
+        m2m_rows = db(
+            Register_Payment_Form.payfid.belongs(reg.payforms)
+        ).select()
         if not m2m_rows:
             return False
     regids = set(r.regid for r in m2m_rows)
@@ -38,7 +44,9 @@ def read_register(num, pf=False):
 
 
 def step1_add_or_edit(guesid):
-    session.register.paying.append({"guest": guesid, "amount": ("%1.2f" % 0.0)})
+    session.register.paying.append(
+        {"guest": guesid, "amount": ("%1.2f" % 0.0)}
+    )
     redirect(URL("register", "register_step2"))
 
 
@@ -75,7 +83,12 @@ def des(txt, codif="utf-8"):
 
     if not isinstance(txt, str):
         txt = str(txt)
-    return normalize("NFKD", txt).encode("ASCII", "ignore").decode("ASCII").lower()
+    return (
+        normalize("NFKD", txt)
+        .encode("ASCII", "ignore")
+        .decode("ASCII")
+        .lower()
+    )
 
 
 def back():
@@ -174,7 +187,9 @@ def log(function):
             str(args),
             str(kwargs),
         )
-        with open("applications/register2event/log_register2event.txt", "a") as log:
+        with open(
+            "applications/register2event/log_register2event.txt", "a"
+        ) as log:
             log.write(txt)
         return function()
 
@@ -187,11 +202,15 @@ def test_performance(function):
         import time
 
         print("-" * 80)
-        print("Memory (Before): {}Mb".format(mem_profile.memory_usage_psutil()))
+        print(
+            "Memory (Before): {}Mb".format(mem_profile.memory_usage_psutil())
+        )
         t1 = time.clock()
         function()
         t2 = time.clock()
-        print("Memory (After) : {}Mb".format(mem_profile.memory_usage_psutil()))
+        print(
+            "Memory (After) : {}Mb".format(mem_profile.memory_usage_psutil())
+        )
         print("Took {} Seconds".format(t2 - t1))
         return function()
 
@@ -235,7 +254,9 @@ def adjust_bedroom_mapp(evenid):
     mapping = db(Bedrooms_mapping.evenid == evenid).select().first()
     regs = db(Register.evenid == evenid).select()
     registers = [
-        int(r.guesid) for r in regs if r.lodge == "LDG" and not r.credit and r.is_active
+        int(r.guesid)
+        for r in regs
+        if r.lodge == "LDG" and not r.credit and r.is_active
     ]
     for bedroom in mapping.bedrooms:
         for n, guesid in enumerate(bedroom[1]):
@@ -253,9 +274,17 @@ def get_bedrooms(evenid):
     bedrooms = []
     for bedroom in _bedrooms.bedrooms:
         if sum(bedroom[1] + bedroom[2]) > 0:
-            bed = [[n, bedroom[0], "bed", bedroom[5]] for n in bedroom[1] if n != 0]
+            bed = [
+                [n, bedroom[0], "bed", bedroom[5]]
+                for n in bedroom[1]
+                if n != 0
+            ]
             bedrooms += bed
-            top = [[n, bedroom[0], "top", bedroom[5]] for n in bedroom[2] if n != 0]
+            top = [
+                [n, bedroom[0], "top", bedroom[5]]
+                for n in bedroom[2]
+                if n != 0
+            ]
             bedrooms += top
     return bedrooms
 
@@ -269,3 +298,86 @@ def get_bedroom(evenid, guesid):
         else:
             bedroom = None
     return bedroom
+
+
+def get_guest_stay(guesid, stay_id=False, centid=None, edit=False):
+    if stay_id:
+        stay = Guest_Stay[stay_id]
+    elif edit:
+        stay = (
+            db((Guest_Stay.guesid == guesid) & (Guest_Stay.center == centid))
+            .select()
+            .first()
+        )
+    else:
+        stay = False
+
+    form = SQLFORM.factory(
+        Field(
+            "stay_id",
+            "integer",
+            default=stay.id if stay else None,
+            label=T("id"),
+        ),
+        Field(
+            "guesid",
+            "integer",
+            default=guesid,
+            label=T("guesid"),
+        ),
+        Field(
+            "center",
+            requires=IS_IN_DB(db, "center.id", center_repr),
+            default=stay.center if stay else None,
+            label=T("center"),
+        ),
+        Field(
+            "lodge",
+            requires=IS_IN_SET(LODGE_TYPES),
+            default=stay.lodge if stay else "LDG",
+            label=T("lodge"),
+        ),
+        Field(
+            "arrival_date",
+            requires=IS_IN_SET(ARRIVAL_DATE),
+            default=stay.arrival_date if stay else "D1",
+            label=T("arrival date"),
+        ),
+        Field(
+            "arrival_time",
+            requires=IS_IN_SET(ARRIVAL_TIME),
+            default=stay.arrival_time if stay else "BL",
+            label=T("arrival time"),
+        ),
+        Field(
+            "no_stairs",
+            "boolean",
+            default=stay.no_stairs if stay else None,
+            label=T("no stairs"),
+        ),
+        Field(
+            "no_top_bunk",
+            "boolean",
+            default=stay.no_top_bunk if stay else None,
+            label=T("no top bunk"),
+        ),
+        Field(
+            "staff",
+            requires=IS_EMPTY_OR(IS_IN_SET(STAFFS)),
+            default=stay.staff if stay else "KIT",
+            label=T("staff"),
+        ),
+        Field("ps", "text", default=stay.ps if stay else None, label=T("ps")),
+        Field(
+            "description",
+            "text",
+            default=stay.description if stay else None,
+            label=T("outras tarefas"),
+        ),
+        Field("up_date", "boolean", label=T("update stay")),
+        submit_button="Update" if edit else "Add",
+    )
+    form.element(_name="description")["_rows"] = 1
+    form.element(_name="ps")["_rows"] = 1
+    form.element(_type="submit")["_class"] = "btn btn-primary btn-lg"
+    return form

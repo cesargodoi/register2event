@@ -514,3 +514,30 @@ CREATE TABLE "bedrooms_mapping"(
     "modified_by" INTEGER REFERENCES "auth_user" ("id") ON DELETE CASCADE  
 );
 faked!
+timestamp: 2022-10-21T06:44:46.159029
+ALTER TABLE "guest_stay" ADD "bedroom__tmp" INTEGER;
+faked!
+UPDATE "guest_stay" SET "bedroom__tmp"="bedroom";
+faked!
+ALTER TABLE "guest_stay" DROP COLUMN "bedroom";
+faked!
+ALTER TABLE "guest_stay" ADD "bedroom" INTEGER;
+faked!
+UPDATE "guest_stay" SET "bedroom"="bedroom__tmp";
+faked!
+ALTER TABLE "guest_stay" DROP COLUMN "bedroom__tmp";
+faked!
+timestamp: 2022-10-21T06:44:46.163554
+ALTER TABLE "guest_stay" ADD "bedroom_alt__tmp" INTEGER;
+faked!
+UPDATE "guest_stay" SET "bedroom_alt__tmp"="bedroom_alt";
+faked!
+ALTER TABLE "guest_stay" DROP COLUMN "bedroom_alt";
+faked!
+ALTER TABLE "guest_stay" ADD "bedroom_alt" INTEGER;
+faked!
+UPDATE "guest_stay" SET "bedroom_alt"="bedroom_alt__tmp";
+faked!
+ALTER TABLE "guest_stay" DROP COLUMN "bedroom_alt__tmp";
+faked!
+success!

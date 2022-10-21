@@ -61,11 +61,29 @@ def edit():
     or auth.has_membership("office")
 )
 def new_stay():
-    new_stay = SQLFORM(Guest_Stay, submit_button="add")
+    guesid = request.vars.guest_id
+
+    new_stay = get_guest_stay(guesid)
     stay_adjust_to_view(new_stay)
+    new_stay.element(_id="no_table_up_date__row")["_style"] = "display:none;"
+
     if new_stay.process().accepted:
+        _stay = dict(
+            guesid=request.vars.guesid,
+            center=request.vars.center,
+            lodge=request.vars.lodge,
+            arrival_date=request.vars.arrival_date,
+            arrival_time=request.vars.arrival_time,
+            no_stairs=request.vars.no_stairs,
+            no_top_bunk=request.vars.no_top_bunk,
+            staff=request.vars.staff,
+            description=request.vars.description,
+            ps=request.vars.ps,
+        )
+        db[Guest_Stay].insert(**_stay)
+
         if request.vars.on_reg:
-            vars = {"guesid": request.vars.guest_id}
+            vars = {"guesid": guesid}
             redirect(URL("register", "confirm_guest", vars={**vars}))
         else:
             vars = {
@@ -73,7 +91,7 @@ def new_stay():
                 "tab": "stay",
             }
             redirect(URL("show", vars={**vars}))
-    return dict(form=new_stay, guesid=request.vars.guesid)
+    return dict(form=new_stay, guesid=guesid)
 
 
 # edit stay
@@ -84,54 +102,51 @@ def new_stay():
     or auth.has_membership("office")
 )
 def edit_stay():
-    guest = Guest[request.vars.guest_id]
-    edit_stay = SQLFORM(
-        Guest_Stay, request.vars.stayid, submit_button="update"
-    )
+    guesid = request.vars.guest_id
+    stayid = request.vars.stayid
+    guest = Guest[guesid]
+
+    edit_stay = get_guest_stay(guesid, stay_id=stayid, edit=True)
     stay_adjust_to_view(edit_stay, edit=True)
+    edit_stay.element(_id="no_table_up_date__row")["_style"] = "display:none;"
+
     if edit_stay.process().accepted:
+        stay = Guest_Stay[request.vars.stay_id]
+
+        _stay = dict(
+            lodge=request.vars.lodge,
+            arrival_date=request.vars.arrival_date,
+            arrival_time=request.vars.arrival_time,
+            no_stairs=request.vars.no_stairs,
+            no_top_bunk=request.vars.no_top_bunk,
+            staff=request.vars.staff,
+            description=request.vars.description,
+            ps=request.vars.ps,
+        )
+        stay.update_record(**_stay)
+
         if request.vars.on_reg:
-            vars = {"guesid": request.vars.guest_id}
+            vars = {"guesid": guesid}
             redirect(URL("register", "confirm_guest", vars={**vars}))
         else:
-            vars = {"guesid": request.vars.guest_id, "tab": "stay"}
+            vars = {"guesid": guesid, "tab": "stay"}
             redirect(URL("show", vars={**vars}))
 
-    return dict(form=edit_stay, guest=guest.name, stay=request.vars.stayid)
+    return dict(form=edit_stay, guest=guest.name, stay=stayid)
 
 
 # helper to stay adjust to view ###############################################
-def stay_adjust_to_view(form, edit=False):
-    if request.vars.guest_id:
-        elm_guesid = form.element(_name="guesid")
-        elm_guesid.element("option", _value=request.vars.guest_id)[
-            "_selected"
-        ] = "selected"
-    if request.vars.center_id:
-        elm_centid = form.element(_name="center")
-        elm_centid.element("option", _value=request.vars.center_id)[
-            "_selected"
-        ] = "selected"
-        form.element(_id="guest_stay_center__row")["_style"] = "display:none;"
-    form.element(_id="guest_stay_guesid__row")["_style"] = "display:none;"
-    form.element(_id="guest_stay_bedroom__row")["_style"] = "display:none;"
-    form.element(_id="guest_stay_bedroom_alt__row")["_style"] = "display:none;"
-    form.element(_id="guest_stay_description__row")["_style"] = "display:none;"
+def stay_adjust_to_view(form, centid=None, edit=False):
+    form.element(_id="no_table_stay_id__row")["_style"] = "display:none;"
+    form.element(_id="no_table_guesid__row")["_style"] = "display:none;"
+    form.element(_id="no_table_description__row")["_style"] = "display:none;"
     form.element(_name="ps")["_rows"] = 1
     form.element(_type="submit")["_class"] = "btn btn-primary btn-lg"
-    if edit:
-        form.element(_id="guest_stay_id__row")["_style"] = "display:none;"
-        if auth.has_membership("root") or auth.has_membership("admin"):
-            form.element(_id="guest_stay_bedroom__row")[
-                "_style"
-            ] = "display:block;"  # esconder
-            form.element(_id="guest_stay_bedroom_alt__row")[
-                "_style"
-            ] = "display:block;"  # esconder
-            form.element(_id="guest_stay_description__row")[
-                "_style"
-            ] = "display:block;"
-            form.element(_name="description")["_rows"] = 1
+    if edit and auth.has_membership("root") or auth.has_membership("admin"):
+        form.element(_id="no_table_description__row")[
+            "_style"
+        ] = "display:block;"
+        form.element(_name="description")["_rows"] = 1
 
 
 # list

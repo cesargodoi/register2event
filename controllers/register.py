@@ -12,11 +12,14 @@ def guest_selector():
         return ""
     pattern = "%" + request.vars.guest.lower() + "%"
     if auth.has_membership("root") or (
-        auth.has_membership("admin") and auth.user.center == request.vars.centid
+        auth.has_membership("admin")
+        and auth.user.center == request.vars.centid
     ):
         query = Guest.name_sa.lower().like(pattern)
     else:
-        query = Guest.name_sa.lower().like(pattern) & (Guest.center == auth.user.center)
+        query = Guest.name_sa.lower().like(pattern) & (
+            Guest.center == auth.user.center
+        )
     selected = [
         [des(row.name), row.id]
         for row in db(query).select(orderby=Guest.name_sa, limitby=(0, 10))
@@ -121,7 +124,9 @@ def register_step2():
         if PAY.get("FRE"):
             PAY.pop("FRE")
     form = SQLFORM.factory(
-        Field("ptype", requires=IS_IN_SET(PAY), default="CSH", label=T("type")),
+        Field(
+            "ptype", requires=IS_IN_SET(PAY), default="CSH", label=T("type")
+        ),
         Field(
             "bflag",
             requires=IS_EMPTY_OR(IS_IN_DB(db, "bank_flag.id", "%(name)s")),
@@ -389,6 +394,7 @@ def edit_stay():
             guest_stay.update_record(**new_stay)
         adjust_bedroom_mapp(register.evenid)
         redirect(URL("events", "show", vars={"evenid": register.evenid}))
+
     return dict(form=edit, register=register)
 
 
@@ -514,9 +520,13 @@ def unenroll_verify():
     else:
         # tratando de pagamentos regulares #########################################################
         payforms = db(Payment_Form.id.belongs(reg.payforms)).select()
-        dict_pf = {n: (p.pay_type, p.guesid, p.amount) for n, p in enumerate(payforms)}
+        dict_pf = {
+            n: (p.pay_type, p.guesid, p.amount) for n, p in enumerate(payforms)
+        }
         not_delete = [
-            p.pay_type for p in payforms if p.pay_type in ["DBT", "CDT", "DPT", "TRF"]
+            p.pay_type
+            for p in payforms
+            if p.pay_type in ["DBT", "CDT", "DPT", "TRF"]
         ]
         # verifica se tem credito do hóspede nas formas de pagamento
         if "GSC" in [v[0] for v in dict_pf.values()]:
@@ -650,7 +660,9 @@ def unenroll_generate_credit_gsc():
     db(Register_Payment_Form.payfid.belongs(devol_ids)).delete()
     # ajustar a nova quantia (do valor restante) por hóspede
     old_amount = sum([r.amount for r in read.registers])
-    new_amount = (old_amount - sum([td[1] for td in to_devol])) / len(read.registers)
+    new_amount = (old_amount - sum([td[1] for td in to_devol])) / len(
+        read.registers
+    )
     # ajustar os registros
     # verificar se tem mais de um registro atrelado
     if len(read.registers) > 1:
@@ -684,7 +696,9 @@ def unenroll_generate_credit_gsc():
                 created_by=auth.user.id,
             )
             Reg.update_credit_and_log(r.guesid, r.evenid, new_amount, "GEN")
-        return 'location.href="%s";' % URL("events", "show", vars={"evenid": evenid})
+        return 'location.href="%s";' % URL(
+            "events", "show", vars={"evenid": evenid}
+        )
 
 
 @auth.requires_login()

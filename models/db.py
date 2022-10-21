@@ -377,8 +377,8 @@ Guest_Stay = db.define_table(
     Field("no_top_bunk", "boolean", default=False),
     Field("arrival_date", default="D1", length=2),
     Field("arrival_time", default="BL", length=2),
-    Field("bedroom", "reference bedroom"),
-    Field("bedroom_alt", "reference bedroom"),
+    Field("bedroom", "integer"),
+    Field("bedroom_alt", "integer"),
     Field("staff", length=3),
     Field("description", "text"),
     Field("ps", "text"),
@@ -389,12 +389,6 @@ Guest_Stay.center.requires = IS_IN_DB(db, "center.id", center_repr)
 Guest_Stay.lodge.requires = IS_IN_SET(LODGE_TYPES)
 Guest_Stay.arrival_date.requires = IS_IN_SET(ARRIVAL_DATE)
 Guest_Stay.arrival_time.requires = IS_IN_SET(ARRIVAL_TIME)
-Guest_Stay.bedroom.requires = IS_EMPTY_OR(
-    IS_IN_DB(db, "bedroom.id", bedroom_repr)
-)
-Guest_Stay.bedroom_alt.requires = IS_EMPTY_OR(
-    IS_IN_DB(db, "bedroom.id", bedroom_repr)
-)
 Guest_Stay.staff.requires = IS_EMPTY_OR(IS_IN_SET(STAFFS))
 
 

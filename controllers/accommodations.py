@@ -164,7 +164,7 @@ def bedroom_on_event():
     bedroom.beds = mapp[1]
     bedroom.tops = mapp[2]
     # creating a dict of name
-    _ids = filter((lambda x: x != 0), (mapp[1] + mapp[2]))
+    _ids = [x for x in bedroom[1] + bedroom[2] if x != 0]
     guests = {
         r.guesid: dict(
             name=shortname(r.guesid.name),
@@ -198,6 +198,7 @@ def add_to_bedroom():
     gender = request.vars.gender
     bedroomid = int(request.vars.bedroomid)
     regid = int(request.vars.regid)
+
     if request.vars.fromguest:
         try_to_allocate = Mapp.choose_a_bed(
             evenid, guesid, bedroomid, regid, event_type, from_mapp=False
@@ -358,7 +359,7 @@ def remove_from_bedroom():
         )
 
 
-###############################################################################
+#  guest bedroom  #############################################################
 @auth.requires_login()
 @auth.requires(auth.has_membership("root") or auth.has_membership("admin"))
 def guest_bedroom():
@@ -366,7 +367,7 @@ def guest_bedroom():
 
     bedroom = get_bedroom(request.vars.evenid, request.vars.guesid)
     if bedroom:
-        _ids = filter((lambda x: x != 0), (bedroom[1] + bedroom[2]))
+        _ids = [x for x in bedroom[1] + bedroom[2] if x != 0]
         guests = {
             int(r.guesid): dict(
                 name=shortname(r.guesid.name),
