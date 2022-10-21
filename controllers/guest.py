@@ -11,10 +11,14 @@
 def new():
     new = SQLFORM(Guest, submit_button="add")
     if auth.has_membership("root") or auth.has_membership("admin"):
-        new.element("option", _value=int(auth.user.center))["_selected"] = "selected"
+        new.element("option", _value=int(auth.user.center))[
+            "_selected"
+        ] = "selected"
     elif auth.user.center:
         new.element(_id="guest_center__row")["_style"] = "display:none;"
-        new.element("option", _value=int(auth.user.center))["_selected"] = "selected"
+        new.element("option", _value=int(auth.user.center))[
+            "_selected"
+        ] = "selected"
     if not auth.has_membership("root"):
         new.element(_id="guest_credit__row")["_style"] = "display:none;"
     new.element(_name="ps")["_rows"] = 1
@@ -81,7 +85,9 @@ def new_stay():
 )
 def edit_stay():
     guest = Guest[request.vars.guest_id]
-    edit_stay = SQLFORM(Guest_Stay, request.vars.stayid, submit_button="update")
+    edit_stay = SQLFORM(
+        Guest_Stay, request.vars.stayid, submit_button="update"
+    )
     stay_adjust_to_view(edit_stay, edit=True)
     if edit_stay.process().accepted:
         if request.vars.on_reg:
@@ -116,9 +122,15 @@ def stay_adjust_to_view(form, edit=False):
     if edit:
         form.element(_id="guest_stay_id__row")["_style"] = "display:none;"
         if auth.has_membership("root") or auth.has_membership("admin"):
-            form.element(_id="guest_stay_bedroom__row")["_style"] = "display:block;"
-            form.element(_id="guest_stay_bedroom_alt__row")["_style"] = "display:block;"
-            form.element(_id="guest_stay_description__row")["_style"] = "display:block;"
+            form.element(_id="guest_stay_bedroom__row")[
+                "_style"
+            ] = "display:block;"  # esconder
+            form.element(_id="guest_stay_bedroom_alt__row")[
+                "_style"
+            ] = "display:block;"  # esconder
+            form.element(_id="guest_stay_description__row")[
+                "_style"
+            ] = "display:block;"
             form.element(_name="description")["_rows"] = 1
 
 
@@ -157,7 +169,9 @@ def list():
         extr_vars = {"t": ""}
     else:
         if term.isdigit():
-            query = (Guest.enrollment == term) & (Guest.center == auth.user.center)
+            query = (Guest.enrollment == term) & (
+                Guest.center == auth.user.center
+            )
             extr_vars = {"t": ""}
         else:
             like_term = des("%%%s%%" % term.lower())
@@ -174,7 +188,9 @@ def list():
         renderstyle=False,
     )
     paginator.records = db(query).count()
-    paginate_info = PaginateInfo(paginator.page, paginator.paginate, paginator.records)
+    paginate_info = PaginateInfo(
+        paginator.page, paginator.paginate, paginator.records
+    )
     rows = db(query).select(limitby=paginator.limitby(), orderby=Guest.name_sa)
 
     return dict(
@@ -197,7 +213,9 @@ def show():
     guest.age = get_age(guest.birthday) if guest.birthday else ""
     stays = db(Guest_Stay.guesid == guesid).select() or None
     credit_log = guest.credit_log.select(orderby=~Credit_Log.id)
-    historic = db(Register.guesid == guesid).select(orderby=~Register.created_on)
+    historic = db(Register.guesid == guesid).select(
+        orderby=~Register.created_on
+    )
     tab = request.vars.tab if request.vars.tab else "home"
     return dict(
         guest=guest,

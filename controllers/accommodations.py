@@ -183,7 +183,7 @@ def bedroom_on_event():
     )
 
 
-# add or remove from accommodations
+# add or remove from accommodations ###########################################
 @auth.requires_login()
 @auth.requires(
     auth.has_membership("root")
@@ -358,6 +358,7 @@ def remove_from_bedroom():
         )
 
 
+###############################################################################
 @auth.requires_login()
 @auth.requires(auth.has_membership("root") or auth.has_membership("admin"))
 def guest_bedroom():
@@ -565,7 +566,7 @@ def guest_bedroom():
                 guesid=request.vars.guesid,
                 gender=register.guesid.gender,
                 regid=register.id,
-                fromguest=True,
+                fromguest=True,  # ???????????????????????????????????????????
             ),
             submit_button="select",
         )
