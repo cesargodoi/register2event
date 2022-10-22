@@ -1,160 +1,68 @@
 {{extend 'layout.html'}}
 
 {{block header}}
-  <h3>
-    {{if gencredit:}}
-    {{=T('generate credit')}}&nbsp;<small>&nbsp;&nbsp;&nbsp;{{=T('step')}} 2 - {{=T('values and payment form')}}</small>
-    {{elif session.register.edit_registers:}}
-    {{=T('edit registers')}}
-    {{elif session.register.delete_registers:}}
-    {{=T('delete and rearrange registers')}}
-    {{else:}}
-    {{=T('register')}}&nbsp;<small>&nbsp;&nbsp;&nbsp;{{=T('step')}} 2 - {{=T('values and payment form')}}</small>
-    {{pass}}
-  </h3>
-{{end}}
-
-{{block control_menu}}
-  <div class="btn-group" role="group">
-    {{if not session.register.creddevol:}}
-    <button id="add" type="button" class="btn btn-primary" onclick="window.open('{{=URL('register', 'register_step1', vars={'evenid':evenid, 'centid':centid})}}', '_self')">
-      <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-    </button>
-    {{pass}}
-    <button type="button" class="btn btn-danger" onclick="cancelRegister({{=evenid}})">
-      <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-    </button>
+  <div class="row">
+    <div class="col-md-5">
+      <h3>
+        {{if gencredit:}}
+          Gerar crédito&nbsp;<small>&nbsp;&nbsp;&nbsp;{{=T('step')}} 2 - Valores e formas de pagamento</small>
+        {{elif session.register.edit_registers:}}
+          Registro&nbsp;<small>&nbsp;&nbsp;&nbsp;Editar valores e formas de pagamento</small>
+        {{elif session.register.delete_registers:}}
+          Registro&nbsp;<small>&nbsp;&nbsp;&nbsp;Apagar e rearanjar os registros</small>
+        {{else:}}
+          Registro&nbsp;<small>&nbsp;&nbsp;&nbsp;{{=T('step')}} 2 - Valores e formas de pagamento</small>
+        {{pass}}
+      </h3>
+    </div>
+    <div class="col-md-7">
+      <div class="btn-group pull-right">
+        {{if not session.register.creddevol:}}
+          <button id="add" type="button" class="btn btn-primary" onclick="window.open('{{=URL('register', 'register_step1', vars={'evenid':evenid, 'centid':centid})}}', '_self')">
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+            Adicionar outro
+          </button>
+        {{pass}}
+        <button type="button" class="btn btn-danger" onclick="cancelRegister({{=evenid}})">
+          <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+          Cancelar
+        </button>
+      </div>
+    </div>
   </div>
 {{end}}
+
 
 <div class="row">
   <div class="col-md-6">
-    <table class="table table-hover table-condensed">
-      <caption>guests and amounts</caption>
-      <thead>
-        <tr>
-          <th width="5%">#</th>
-          <th width="30%">{{=T('guest')}}</th>
-          <th width="50%"></th>
-          <th width="10%" class="text-right">{{=T('value')}} ({{=T('$')}})</th>
-          <th width="5%"></th>
-        </tr>
-      </thead>
-      <tbody>
-        {{js_vars = []
-        js_to_update = []
-        totalpay = 0.
-        for n, guest in enumerate(guests):
-          var = 'amount%s' % str(n+1)
-          to_update = '%s.name,%s.value' % (var, var)
-          js_vars.append(var)
-          js_to_update.append(to_update)
-        }}
-        <tr>
-          <th scope="row">{{=n+1}}</th>
-          <td>{{=shortname(guest.name)}}</td>
-          <td>
-            {{if guest.credit:}}
-            <span class="label label-primary">${{=guest.credit}}</span>
-            {{pass}}
-          </td>
-          <td>
-            <input class="form-control text-right" name="{{=guest.guesid}}" id="amount{{=str(n+1)}}" type="text" value="{{=guest.amount}}" onblur="newEntry(this,{{=guest.guesid}});toConclude();" style="width: 80px">
-          </td>
-          <td>
-            {{if len(guests)>1:}}
-            <button type="button" class="btn btn-danger btn-xs" onclick="delGuest({{=guest.guesid}});">
-              <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-            </button>
-            {{pass}}
-          </td>
-        </tr>
-        {{pass}}
-        <tr>
-          <td colspan="2"></td>
-          <td class="text-right"><strong>TOTAL</strong></td>
-          <td>
-            <input class="form-control text-right" name="total" id="total" type="text"  style="width: 80px" disabled>
-          </td>
-          <td></td>
-        </tr>
-      </tbody>
-    </table>
+    {{ include 'register/elements/guests_and_values.html' }}
     {{express = ' + '.join(js_vars)
       express_to_updt = ','.join(js_to_update)}}
-
   </div>
   <div id="payment_forms" class="col-md-6">
-    {{if not payforms:}}
-    <table class="table table-hover table-condensed" style="display: none">
-    {{else:}}
-    <table class="table table-hover table-condensed">
-    {{pass}}
-      <caption>{{=T('payment forms')}}</caption>
-      <thead>
-        <tr>
-          <th width="5%">#</th>
-          <th width="10%">{{=T('type')}}</th>
-          <th width="30%">{{=T('details')}}</th>
-          <th width="40%"></th>
-          <th width="10%" class="text-right">{{=T('value')}} ({{=T('$')}})</th>
-          <th width="5%"></th>
-        </tr>
-      </thead>
-      <tbody>
-        {{frees = 0}}
-        {{for i, pf in enumerate(payforms):}}
-        <tr id="pf{{=i}}">
-          <th scope="row">{{=i+1}}</th>
-          <td>{{=pf.ptype}}</td>
-          {{if pf.ptype == 'FRE':
-               frees += 1
-            pass}}
-          {{if pf.ptype=="GSC":}}
-          <td>{{=GSC[int(pf.gscred)]}}</td>
-          <td><span class="label label-primary">{{=T('credit')}}</span></td>
-          {{else:}}
-          <td>{{=pf.bflagname}}</td><td>{{=pf.ctrl}}</td>
-          {{pass}}
-          <td class="text-right"><b>{{='%1.2f' % pf.value}}</b></td>
-          {{totalpay += float(pf.value)}}
-          <td>
-            {{if session.register.creddevol:}}
-              {{if pf.ptype not in ['DBT','CDT','DPT','TRF']:}}
-            <button type="button" class="btn btn-danger btn-xs" onclick="delPayform({{=i}});">
-              <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-            </button>
-              {{pass}}
-            {{else:}}
-            <button type="button" class="btn btn-danger btn-xs" onclick="delPayform({{=i}});">
-              <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-            </button>
-            {{pass}}
-          </td>
-        </tr>
-        {{pass}}
-        <tr>
-          <td colspan="3"></td>
-          <td  class="text-right"><strong>{{=T('DEBT')}}</strong></td>
-          <td>
-            <input class="form-control text-right" name="debt" id="debt" type="text"  style="width: 80px" disabled>
-          </td>
-          <td></td>
-        </tr>
-      </tbody>
-    </table>
-    <button id="addPayForms" type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#payForms">{{=T('payment form')}}</button>
-    <button id="pbcash" type="button" class="btn btn-success btn-lg" onclick="window.open('{{=URL('register','pay_by_cash')}}', '_self')" style="display: none;">{{=T('pay by cash')}}</button>
-    {{if session.register.delete_registers:
-        conclude_link = URL('register', 'gen_credit')
-        button = T('generate credit')
-      else:
-        conclude_link = URL('register', 'conclude')
-        button = T('conclude')
-      pass
-    }}
-    <button id="conclude" type="button" class="btn btn-primary btn-lg" onclick="window.open('{{=conclude_link}}', '_self')" style="display: none;">{{=button}}</button>
-    <button class="btn btn-danger btn-lg" onclick="cancelRegister({{=evenid}})">{{=T('cancel')}}</button>
+    {{ include 'register/elements/payment_forms.html' }}
+    <div class="pull-right">
+      <button id="addPayForms" type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#payForms">
+        <span class="glyphicon glyphicon-qrcode"></span>
+        Forma de pagamento
+      </button>
+      <button id="pbcash" type="button" class="btn btn-success btn-lg" onclick="window.open('{{=URL('register','pay_by_cash')}}', '_self')" style="display: none;">
+        <span class="glyphicon glyphicon-usd"></span>
+        Pagar com dinheiro
+      </button>
+      {{if session.register.delete_registers:
+          conclude_link = URL('register', 'gen_credit')
+          button = 'Gerar crédito'
+        else:
+          conclude_link = URL('register', 'conclude')
+          button = 'Concluir'
+        pass
+      }}
+      <button id="conclude" type="button" class="btn btn-primary btn-lg" onclick="window.open('{{=conclude_link}}', '_self')" style="display: none;">
+        <span class="glyphicon glyphicon-ok"></span>
+        {{=button}}
+      </button>
+    </div>
   </div>
 </div>
 

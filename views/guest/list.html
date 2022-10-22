@@ -1,22 +1,26 @@
 {{extend 'layout.html'}}
 
 {{block header}}
-  <h2>{{=T('guests')}}</h2>
-{{end}}
-
-{{block link_menu}}{{end}}
-
-{{block control_menu}}
-  {{=search}}
-  <div class="btn-group" role="group">
-    {{if auth.has_membership('root') or auth.has_membership('admin') or auth.has_membership('office'):}}
-    <button type="button" class="btn btn-primary" onclick="window.open('{{=URL('new')}}', '_self')">
-      <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-    </button>
-    {{pass}}
-    <button type="button" class="btn btn-info" onclick="goBack()">
-      <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
-    </button>
+  <div class="row">
+    <div class="col-md-5">
+      <h2>Hospedes</h2>
+    </div>
+    <div class="col-md-7">
+      <br>
+      <div class="btn-group pull-right">
+        {{=search}}
+        {{if auth.has_membership('root') or auth.has_membership('admin') or auth.has_membership('office'):}}
+          <button type="button" class="btn btn-primary" onclick="window.open('{{=URL('new')}}', '_self')">
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+            Adicionar
+          </button>
+        {{pass}}
+        <button type="button" class="btn btn-info" onclick="goBack()">
+          <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+          Voltar
+        </button>
+      </div>
+    </div>
   </div>
 {{end}}
 
@@ -25,11 +29,9 @@
   {{ include 'paginator.html' }}
 
   <br>
-
-    {{for i, row in enumerate(rows):}}
-      {{ include 'guest/elements/guest_row.html' }}
-    {{pass}}
-
+  {{ for i, row in enumerate(rows): }}
+    {{ include 'guest/elements/guest_row.html' }}
+  {{ pass }}
   <br>
 
   {{ include 'paginator.html' }}

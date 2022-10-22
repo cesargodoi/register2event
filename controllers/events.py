@@ -191,7 +191,7 @@ def show():
     # search
     search = FORM(
         DIV(INPUT(_name="term", _class="form-control"), _class="form-group"),
-        INPUT(_type="submit", _class="btn btn-default", _value=T("search")),
+        INPUT(_type="submit", _class="btn btn-info", _value=T("search")),
         DIV(
             LABEL(INPUT(_name="unalloc", _type="checkbox"), T("not hosteds")),
             _class="checkbox",
@@ -201,7 +201,7 @@ def show():
     )
     if not admin_view:
         search.element(_id="unalloc")["_style"] = "display:none;"
-    search.element(_name="term")["_style"] = "width: 200px;"
+    search.element(_name="term")["_style"] = "width: 18rem;"
     search.element(_name="term")["_placeholder"] = T("search")
 
     # select query

@@ -586,6 +586,7 @@
 'search guest': 'buscar hóspede',
 'secound day': 'segundo dia',
 'select': 'selecionar',
+'select a guest': 'select a guest',
 'select a guest with credit': 'selecionar um hóspede com crédito',
 'select an guest': 'selecionar um hóspede',
 'select the payment form': 'selecionar a forma de pagamento',
