@@ -1,7 +1,32 @@
 {{extend 'layout.html'}}
 
 {{block header}}
-  <h3><strong>{{=building.building}}</strong></h3>
+  <div class="row">
+    <div class="col-lg-8">
+      <h3><strong>{{=building.building}}</strong></h3>
+    </div>
+    <div class="col-lg-4">
+      <br>
+      {{if session.mapp.difference and event.status == 'OPN':}}
+        <span class="pull-right">
+          {{=T('there is a difference between bedrooms and the mapping')}}
+          <strong><a href="#" onclick="updateMapping({{=event.id}});">{{=T('fix it')}}?</a></strong>
+        </span>
+      {{pass}}
+      {{ if guests_unallocated: }}
+        <button 
+          type="button"
+          class="btn pull-right"
+          data-toggle="modal"
+          data-target="#confirm"
+          onclick="#"
+        >
+          <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+          Gerenciar não alocados
+        </button>
+      {{ pass }}
+    </div>
+  </div>
 {{end}}
 
 {{block control_menu}}
@@ -150,7 +175,18 @@
 
 </div>
 
-<div id="confirm" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"></div>
+<div 
+  id="confirm" 
+  class="modal fade" 
+  tabindex="-1" 
+  role="dialog" 
+  aria-labelledby="myModalLabel" 
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    {{ include 'accommodations/elements/guests_unallocated.html' }}
+  </div>
+</div>
 
 <style type="text/css">
 </style>

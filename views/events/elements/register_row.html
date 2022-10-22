@@ -80,12 +80,17 @@
 
       </div>
       <div class="col-sm-2">
-        <div class="text-{{='default' if row.is_active == True else 'muted'}} pull-right"
-             style="font-size: 12pt;" id="amount">
-          {{if row.late:}}
-            <span class="text-{{='danger' if row.is_active == True else 'muted'}} glyphicon glyphicon-time" pull-right></span>&nbsp;&nbsp;
-          {{pass}}
-          <h4>R${{=row.amount}}</h4>
+        <div 
+          class="text-{{='default' if row.is_active == True else 'muted'}} pull-right"
+          style="font-size: 12pt;" 
+          id="amount"
+        >
+          <h4>
+            {{if row.late:}}
+              <span class="text-{{='danger' if row.is_active == True else 'muted'}} glyphicon glyphicon-time" pull-right></span>&nbsp;&nbsp;
+            {{pass}}
+            R${{=row.amount}}
+          </h4>
         </div>
         <div class="clearfix"></div>
         <div class="btn-group btn-group-xs pull-right" role="group" id="buttons">

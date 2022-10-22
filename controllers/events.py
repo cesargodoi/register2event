@@ -253,7 +253,9 @@ def show():
         orderby=Guest.name_sa, limitby=paginator.limitby()
     )
     # records = db(gquery).count()
-    rows = db(gquery).select(orderby=Guest.name_sa, limitby=(0, 10))
+    rows = db(gquery).select(
+        orderby=Guest.name_sa, limitby=paginator.limitby()
+    )
     for r in rows:
         for reg in registers:
             if int(r.id) == reg.guesid:
@@ -287,7 +289,6 @@ def show():
         search=search.process(),
         event=event,
         rows=rows,
-        # records=records,
         records=paginator.records,
         paginator=str(paginator),
         paginate_selector=paginate_selector,
