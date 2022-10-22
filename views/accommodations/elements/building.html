@@ -1,0 +1,26 @@
+{{ onOff = 'primary' if row.is_active else 'secondary' }}
+<div 
+  id="{{= row.id }}"
+  class="card" 
+  onclick="window.open('{{= URL('building_on_event', vars={'builid':row.id, 'evenid':event.id}) }}', '_self')"
+  style="width: 25rem; height: auto;"
+>
+  <div class="text-center text-{{= onOff }} mt-2">
+    <i class="bi bi-building h1"></i>
+  </div>
+  <div class="card-body">
+    <h4 class="card-title text-center text-{{= onOff }}">{{= row.building }}</h4>
+    <table class="table table-sm">
+      <tr>
+        <th class="text-primary text-center">total</th>
+        <th class="text-danger text-center">em uso</th>
+        <th class="text-success text-center">vagas</th>
+      </tr>
+      <tr>
+        <th class="text-primary text-center" style="font-size:2rem;">{{= row.total[0] }}</th>
+        <th class="text-danger text-center" style="font-size:2rem;">{{= row.total[1] }}</th>
+        <th class="text-success text-center" style="font-size:2rem;">{{= row.total[2] }}</th>
+      </tr>
+    </table>
+  </div>
+</div>

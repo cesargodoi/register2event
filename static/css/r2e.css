@@ -1,0 +1,50 @@
+/*!
+ * CSS do projeto register2event
+ * Cesar Godoi - 22/10/2022
+ */
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  margin: 1rem;
+  padding: 3rem 1rem 1rem 1rem;
+  min-width: 0;
+  word-wrap: break-word;
+  background-color: #fff;
+  background-clip: border-box;
+  border: 2px solid rgba(0, 0, 0, .25);
+  border-radius: 0.75rem;
+}
+
+.breadcrumb {
+  padding: 8px 15px;
+  margin-bottom: 20px;
+  margin-top: 10px;
+  font-size: 12pt;
+  font-weight: bold;
+  list-style: none;
+  background-color: #e1e0d9;
+  border-radius: 0rem;
+  border-top: 1px solid rgba(0, 0, 0, .25);
+}
+
+.card-title {
+  margin-bottom: .5rem;
+}
+
+.d-flex {
+  display: flex;
+}
+
+.flex-row {
+  flex-direction: row;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.flex-evenly {
+  justify-content: space-evenly;
+}

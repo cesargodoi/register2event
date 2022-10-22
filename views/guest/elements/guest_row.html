@@ -1,0 +1,23 @@
+<div 
+  class="row my_row" 
+  onclick="window.open('{{=URL('show', vars={'guesid':row.id})}}', '_self')"
+>
+  <div class="col-sm-1" width="70px">
+    {{if row.gender=='M':}}
+      <img style="width: 40px;" src="{{=URL('static', 'images', args='spm.png')}}">
+    {{else:}}
+      <img style="width: 40px;" src="{{=URL('static', 'images', args='spf.png')}}">
+    {{pass}}
+  </div>
+  <div class="col-sm-11">
+    <b class="text-primary">{{=shortname(row.name, 30)}}</b>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    {{if row.enrollment:}}<b>{{=row.enrollment}}</b>&nbsp;&nbsp;{{pass}}
+    {{if row.aspect:}}<i>{{=ASPECTS[row.aspect]}}</i>&nbsp;&nbsp;&nbsp;{{pass}}
+    {{if row.city:}}{{='%(city)s - %(state_prov)s(%(country)s)' % row}}{{pass}}
+    <br />
+    {{if row.cell_phone:}}{{=phone_format(row.cell_phone)}}&nbsp;&nbsp;&nbsp;{{pass}}
+    {{if row.email:}}<i><a href="mailto:{{=row.email}}">{{=row.email}}</a></i>{{pass}}
+    <br />
+  </div>
+</div>

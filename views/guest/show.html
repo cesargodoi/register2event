@@ -8,6 +8,7 @@
           class="btn btn-info"
           onclick="window.open('{{=URL('list')}}','_self');">
     <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+    Voltar
   </button>
 {{end}}
 
@@ -170,11 +171,11 @@
               </tr>
             {{pass}}
             <tr>
-              <th colspan="7">
+              <th colspan="8">
                 <button type="button"
-                        class="btn btn-primary"
+                        class="btn btn-primary pull-right"
                         onclick="window.open('{{=URL('new_stay', vars={'guest_id':stay.guesid})}}', '_self')">
-                  <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                  <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Add
                 </button>
               </th>
             </tr>

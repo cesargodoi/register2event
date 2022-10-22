@@ -1,64 +1,53 @@
 {{extend 'layout.html'}}
 
 {{block header}}
-  <h2>{{=T('guests')}}</h2>
-{{end}}
-
-{{block link_menu}}{{end}}
-
-{{block control_menu}}
-  {{=search}}
-  <div class="btn-group" role="group">
-    {{if auth.has_membership('root') or auth.has_membership('admin') or auth.has_membership('office'):}}
-    <button type="button" class="btn btn-primary" onclick="window.open('{{=URL('new')}}', '_self')">
-      <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-    </button>
-    {{pass}}
-    <button type="button" class="btn btn-info" onclick="goBack()">
-      <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
-    </button>
+  <div class="row">
+    <div class="col-md-5">
+      <h2>Hospedes</h2>
+    </div>
+    <div class="col-md-7">
+      <br>
+      <div class="btn-group pull-right">
+        {{=search}}
+        {{if auth.has_membership('root') or auth.has_membership('admin') or auth.has_membership('office'):}}
+          <button type="button" class="btn btn-primary" onclick="window.open('{{=URL('new')}}', '_self')">
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+            Adicionar
+          </button>
+        {{pass}}
+        <button type="button" class="btn btn-info" onclick="goBack()">
+          <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+          Voltar
+        </button>
+      </div>
+    </div>
   </div>
 {{end}}
 
 <!-- define the paginator -->
 {{if rows:}}
-{{ include 'paginator.html' }}
+  {{ include 'paginator.html' }}
 
-<br />
-<div class="row">
-  <div class="col-sm-12">
-    <table class="table table-hover table-condensed">
-      {{for i, row in enumerate(rows):}}
-      <tr onclick="window.open('{{=URL('show', vars={'guesid':row.id})}}', '_self')">
-        <td width="70px">
-          <center>
-            {{if row.gender=='M':}}
-              <img style="width: 60px;" src="{{=URL('static', 'images', args='spm.png')}}">
-            {{else:}}
-              <img style="width: 60px;" src="{{=URL('static', 'images', args='spf.png')}}">
-            {{pass}}
-          </center>
-        </td>
-        <td>
-          <b class="text-primary">{{=shortname(row.name, 30)}}</b>
-          <br />
-          {{if row.enrollment:}}<b>{{=row.enrollment}}</b>&nbsp;&nbsp;{{pass}}
-          {{if row.aspect:}}<i>{{=ASPECTS[row.aspect]}}</i>&nbsp;&nbsp;&nbsp;{{pass}}
-          {{if row.city:}}{{='%(city)s - %(state_prov)s(%(country)s)' % row}}{{pass}}
-          <br />
-          {{if row.cell_phone:}}{{=phone_format(row.cell_phone)}}&nbsp;&nbsp;&nbsp;{{pass}}
-          {{if row.email:}}<i><a href="mailto:{{=row.email}}">{{=row.email}}</a></i>{{pass}}
-          <br />
-        </td>
-      </tr>
-      {{pass}}
-    </table>
-  </div>
-</div>
+  <br>
+  {{ for i, row in enumerate(rows): }}
+    {{ include 'guest/elements/guest_row.html' }}
+  {{ pass }}
+  <br>
 
-{{ include 'paginator.html' }}
+  {{ include 'paginator.html' }}
 {{ pass }}
 
 <script type="text/javascript">
-function goBack() {history.go(-1)};
+  function goBack() {history.go(-1)};
 </script>
+
+<style type="text/css">
+  .my_row { 
+    padding: .6rem;
+    border-bottom: 1px solid #cccccc;
+  }
+
+  .my_row:hover {
+    background-color: #cccccc;
+  }
+</style>

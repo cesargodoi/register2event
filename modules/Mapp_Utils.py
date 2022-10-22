@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# bedroom = [id, beds, top_bunks, gender, floor, name]
+
 from gluon import *
 
 # kill bedroom mapping
@@ -82,7 +84,7 @@ def update_mapping(evenid):
 
 def attempt_deallocation(b, mapping, event):
     bedroom = [m for m in mapping if m[0] == b][0]
-    to_deallocation = filter((lambda x: x != 0), (bedroom[1] + bedroom[2]))
+    to_deallocation = [x for x in bedroom[1] + bedroom[2] if x != 0]
     if to_deallocation:
         for g in to_deallocation:
             register = (
@@ -202,6 +204,10 @@ def gen_mapp_buildings(rows):
     return (total, in_use, (total - in_use))
 
 
+def get_total_per_building(bedrooms):
+    return [sum(col) for col in zip(*bedrooms)]
+
+
 def gen_mapp_building(rows):
     bedrooms, total_beds, total_tops, beds_in_use, tops_in_use = 0, 0, 0, 0, 0
     for row in rows:
@@ -299,7 +305,7 @@ def choose_a_bed(evenid, guesid, bedroomid, regid, event_type, from_mapp=True):
             guest_stay.update_record(bedroom_alt=bedroomid)
         else:
             guest_stay.update_record(bedroom=bedroomid)
-        if from_mapp:
+        if from_mapp:  # ????????????????????????????????????????????????????
             init_mapp(
                 evenid=evenid,
                 centid=current.session.mapp.centid,

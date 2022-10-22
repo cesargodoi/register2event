@@ -1,9 +1,7 @@
 {{extend 'layout.html'}}
 
 {{block header}}
-  <h3><strong>{{=building.building}}</strong>&nbsp;&nbsp;
-    <small>{{='%s(%s)' %(event.activity.activity, event.center.shortname)}}</small>&nbsp;&nbsp;
-  </h3>
+  <h3><strong>{{=building.building}}</strong></h3>
 {{end}}
 
 {{block control_menu}}
@@ -14,115 +12,142 @@
   </ol>
 {{end}}
 
-{{block link_menu}}
-{{end}}
-
-<div class="row">
-  <div class="col-sm-6">
-
-    {{if building.male[0]>0:}}
-    <div class="bs-callout bs-callout-info"
-         onclick="window.open('{{=URL('accommodations', 'bedrooms_by_gender_on_event', vars={'builid':building.id, 'gender': 'M', 'evenid':event.id})}}', '_self')">
-      <h4>Alojamentos Masculinos</h4>
-      <table class="table table-condensed">
-        <tr>
-          <th width="17%">{{=T('bedrooms')}}</th>
-          <th width="33%">{{=T('beds')}}</th>
-          <th width="33%">{{=T('top bunks')}}</th>
-          <th width="17%">{{=T('vacancies')}}</th>
-        </tr>
-        <tr style="font-weight: bold;">
-          <td><span class="label label-default">{{=building.male[0]}}</span></td>
-          <td>
-            <span class="label label-primary">{{=building.male[1]}}</span>
-            {{if building.male[2]:}}
-              - <span class="label label-danger">{{=building.male[2]}}</span>
-              = <span class="label label-success">{{=building.male[3]}}</span>
-            {{pass}}
-          </td>
-          <td>
-            <span class="label label-primary">{{=building.male[4]}}</span>
-            {{if building.male[5]:}}
-              - <span class="label label-danger">{{=building.male[5]}}</span>
-              = <span class="label label-success">{{=building.male[6]}}</span>
-            {{pass}}
-          </td>
-          <td><span class="label label-success" style="font-size:11pt;">{{=(building.male[3] + building.male[6])}}</span></td>
-        </tr>
-      </table>
+<div class="d-flex flex-row flex-wrap">
+  {{if building.male[0]>0:}}
+    <div 
+      class="card"
+      onclick="window.open('{{=URL('accommodations', 'bedrooms_by_gender_on_event', vars={'builid':building.id, 'gender': 'M', 'evenid':event.id})}}', '_self')"
+      style="width: 30rem; height: auto;"
+    >
+      <div class="text-center">
+        <img style="width: 100px;" src="{{=URL('static', 'images', args='spm.png')}}">
+      </div>
+      <div class="card-body">
+        <h4 class="card-title text-center"><strong>Alojamentos <br>Masculinos</strong></h4>
+        <table class="table table-condensed">
+          <tr>
+            <th class="text-right" width="50%">{{=T('bedrooms')}}</th>
+            <th><span class="text-default">{{=building.male[0]}}</span></th>
+          </tr>
+          <tr>
+            <th class="text-right">{{=T('beds')}}</th>
+            <th>
+              <span class="text-primary">{{=building.male[1]}}</span>
+              {{if building.male[2]:}}
+                - <span class="text-danger">{{=building.male[2]}}</span>
+                = <span class="text-success">{{=building.male[3]}}</span>
+              {{pass}}
+            </th>
+          </tr>
+          <tr>
+            <th class="text-right">{{=T('top bunks')}}</th>
+            <th>
+              <span class="text-primary">{{=building.male[4]}}</span>
+              {{if building.male[5]:}}
+                - <span class="text-danger">{{=building.male[5]}}</span>
+                = <span class="text-success">{{=building.male[6]}}</span>
+              {{pass}}
+            </th>
+          </tr>
+          <tr>
+            <th class="text-right">{{=T('vacancies')}}</th>
+            <th><span class="text-success" style="font-size:16pt;">{{=(building.male[3] + building.male[6])}}</span></th>
+          </tr>
+        </table>
+      </div>
     </div>
-    {{pass}}
-
-    {{if building.female[0]>0:}}
-    <div class="bs-callout bs-callout-warning"
-         onclick="window.open('{{=URL('accommodations', 'bedrooms_by_gender_on_event', vars={'builid':building.id, 'gender': 'F', 'evenid':event.id})}}', '_self')">
-      <h4>Alojamentos Femininos</h4>
-      <table class="table table-condensed">
-        <tr>
-          <th width="17%">{{=T('bedrooms')}}</th>
-          <th width="33%">{{=T('beds')}}</th>
-          <th width="33%">{{=T('top bunks')}}</th>
-          <th width="17%">{{=T('vacancies')}}</th>
-        </tr>
-        <tr style="font-weight: bold;">
-          <td><span class="label label-default">{{=building.female[0]}}</span></td>
-          <td>
-            <span class="label label-primary">{{=building.female[1]}}</span>
-            {{if building.female[2]:}}
-              - <span class="label label-danger">{{=building.female[2]}}</span>
-              = <span class="label label-success">{{=building.female[3]}}</span>
-            {{pass}}
-          </td>
-          <td>
-            <span class="label label-primary">{{=building.female[4]}}</span>
-            {{if building.female[5]:}}
-              - <span class="label label-danger">{{=building.female[5]}}</span>
-              = <span class="label label-success">{{=building.female[6]}}</span>
-            {{pass}}
-          </td>
-          <td><span class="label label-success" style="font-size:11pt;">{{=(building.female[3] + building.female[6])}}</span></td>
-        </tr>
-      </table>
-    </div>
-    {{pass}}
-
-    {{if building.mixed[0]>0:}}
-    <div class="bs-callout bs-callout-default"
-         onclick="window.open('{{=URL('accommodations', 'bedrooms_by_gender_on_event', vars={'builid':building.id, 'gender': 'X', 'evenid':event.id})}}', '_self')">
-      <h4>Alojamentos Mistos</h4>
-      <table class="table table-condensed">
-        <tr>
-          <th width="17%">{{=T('bedrooms')}}</th>
-          <th width="33%">{{=T('beds')}}</th>
-          <th width="33%">{{=T('top bunks')}}</th>
-          <th width="17%">{{=T('vacancies')}}</th>
-        </tr>
-        <tr style="font-weight: bold;">
-          <td><span class="label label-default">{{=building.mixed[0]}}</span></td>
-          <td>
-            <span class="label label-primary">{{=building.mixed[1]}}</span>
-            {{if building.mixed[2]:}}
-              - <span class="label label-danger">{{=building.mixed[2]}}</span>
-              = <span class="label label-success">{{=building.mixed[3]}}</span>
-            {{pass}}
-          </td>
-          <td>
-            <span class="label label-primary">{{=building.mixed[4]}}</span>
-            {{if building.mixed[5]:}}
-              - <span class="label label-danger">{{=building.mixed[5]}}</span>
-              = <span class="label label-success">{{=building.mixed[6]}}</span>
-            {{pass}}
-          </td>
-          <td><span class="label label-success" style="font-size:11pt;">{{=(building.mixed[3] + building.mixed[6])}}</span></td>
-        </tr>
-      </table>
-    </div>
-    {{pass}}
-
-  </div>
-  {{if session.mapp.unallocateds:}}
-  {{include 'guests_unallocated.html'}}
   {{pass}}
+
+  {{if building.female[0]>0:}}
+    <div 
+      class="card"
+      onclick="window.open('{{=URL('accommodations', 'bedrooms_by_gender_on_event', vars={'builid':building.id, 'gender': 'F', 'evenid':event.id})}}', '_self')"
+      style="width: 30rem; height: auto;"
+    >
+      <div class="text-center">
+        <img style="width: 100px;" src="{{=URL('static', 'images', args='spf.png')}}">
+      </div>
+      <div class="card-body">
+        <h4 class="card-title text-center"><strong>Alojamentos <br>Femininos</strong></h4>
+        <table class="table table-condensed">
+          <tr>
+            <th class="text-right" width="50%">{{=T('bedrooms')}}</th>
+            <th><span class="text-default">{{=building.female[0]}}</span></th>
+          </tr>
+          <tr>
+            <th class="text-right">{{=T('beds')}}</th>
+            <th>
+              <span class="text-primary">{{=building.female[1]}}</span>
+              {{if building.female[2]:}}
+                - <span class="text-danger">{{=building.female[2]}}</span>
+                = <span class="text-success">{{=building.female[3]}}</span>
+              {{pass}}
+            </th>
+          </tr>
+          <tr>
+            <th class="text-right">{{=T('top bunks')}}</th>
+            <th>
+              <span class="text-primary">{{=building.female[4]}}</span>
+              {{if building.female[5]:}}
+                - <span class="text-danger">{{=building.female[5]}}</span>
+                = <span class="text-success">{{=building.female[6]}}</span>
+              {{pass}}
+            </th>
+          </tr>
+          <tr>
+            <th class="text-right">{{=T('vacancies')}}</th>
+            <th><span class="text-success" style="font-size:16pt;">{{=(building.female[3] + building.female[6])}}</span></th>
+          </tr>
+        </table>
+      </div>
+    </div>
+  {{pass}}
+
+  {{if building.mixed[0]>0:}}
+    <div 
+      class="card"
+      onclick="window.open('{{=URL('accommodations', 'bedrooms_by_gender_on_event', vars={'builid':building.id, 'gender': 'X', 'evenid':event.id})}}', '_self')"
+      style="width: 30rem; height: auto;"
+    >
+      <div class="text-center">
+        <img style="width: 100px;" src="{{=URL('static', 'images', args='mixed.png')}}">
+      </div>
+      <div class="card-body">
+        <h4 class="card-title text-center"><strong>Alojamentos <br>Mistos</strong></h4>
+        <table class="table table-condensed">
+          <tr>
+            <th class="text-right" width="50%">{{=T('bedrooms')}}</th>
+            <th><span class="text-default">{{=building.mixed[0]}}</span></th>
+          </tr>
+          <tr>
+            <th class="text-right">{{=T('beds')}}</th>
+            <th>
+              <span class="text-primary">{{=building.mixed[1]}}</span>
+              {{if building.mixed[2]:}}
+                - <span class="text-danger">{{=building.mixed[2]}}</span>
+                = <span class="text-success">{{=building.mixed[3]}}</span>
+              {{pass}}
+            </th>
+          </tr>
+          <tr>
+            <th class="text-right">{{=T('top bunks')}}</th>
+            <th>
+              <span class="text-primary">{{=building.mixed[4]}}</span>
+              {{if building.mixed[5]:}}
+                - <span class="text-danger">{{=building.mixed[5]}}</span>
+                = <span class="text-success">{{=building.mixed[6]}}</span>
+              {{pass}}
+            </th>
+          </tr>
+          <tr>
+            <th class="text-right">{{=T('vacancies')}}</th>
+            <th><span class="text-success" style="font-size:16pt;">{{=(building.mixed[3] + building.mixed[6])}}</span></th>
+          </tr>
+        </table>
+      </div>
+    </div>
+  {{pass}}
+
 </div>
 
 <div id="confirm" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"></div>

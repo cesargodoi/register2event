@@ -12,17 +12,27 @@
     gender_txt = T('mixed')
     gender_color = 'info'
   pass
+
+  if bedroom.floor_room == 0:
+    floor = "Terreo"
+  elif bedroom.floor_room < 0:
+    floor = "Subsolo %s" % abs(bedroom.floor_room)
+  else:
+    floor = "%so." % bedroom.floor_room
+  pass
+
 }}
-<div class="row">
-  <div class="col-sm-12">
-    <h3><strong>{{=bedroom.bedroom}}</strong>&nbsp;&nbsp;
-      <small>
-        {{=building[1]}}&nbsp;&nbsp;
-        <span class="label label-{{=gender_color}}">{{=gender_txt}}</span>
-      </small>
-    </h3>
-  </div>
-</div>
+  <h3>
+    <strong>{{= building[1] }}</strong>
+    <small>
+      &nbsp;&nbsp;|&nbsp;&nbsp;
+      <span class="text-{{= gender_color }}">{{= gender_txt }}</span>
+      &nbsp;&nbsp;|&nbsp;&nbsp;
+      Quarto {{= bedroom.bedroom }}
+      &nbsp;&nbsp;|&nbsp;&nbsp;
+      Andar {{= floor }}
+    </small>
+</h3>
 {{end}}
 
 {{block control_menu}}
@@ -40,148 +50,159 @@
 
 <div class="row">
   {{if bedroom.tops:}}
-  <div class="col-sm-6">
-    <table class="table table-striped">
-      <caption>{{=T('beds')}}</caption>
-      {{for i in bedroom.beds:}}
-        {{if i > 0:}}
-        <tr>
-          <td width="30px">
-            <img src="{{=URL('static', 'images/bedicons', args='bed_BN.png')}}"><br>
-          </td>
-          <td>
-            {{=guests[i]['name']}}
-            <button type="button"
-                    class="btn btn-danger btn-xs pull-right"
-                    onclick="removeFromBedroom({{=i}})">
-              <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-            </button>
-            {{label = 'success'
-              if guests[i]['age']>35 and guests[i]['age']<60:
-                label = 'warning'
-              elif guests[i]['age']>=60:
-                label = 'danger'
-              pass}}
-            <span class="label label-{{=label}} pull-right" style="margin-right: 10px;">{{=guests[i]['age']}}</span>
-            {{if guests[i]['no_stairs']:}}
-            <img class="pull-right" style="margin-right: 10px;" src="{{=URL('static', 'images/bedicons', args='NoStairs.png')}}" width="22px">
-            {{pass}}
-            {{if guests[i]['no_top_bunk']:}}
-            <img class="pull-right" style="margin-right: 10px;" src="{{=URL('static', 'images/bedicons', args='NoTopBunks.png')}}" width="22px">
-            {{pass}}
-          </td>
-        </tr>
-        {{else:}}
-        <tr>
-          <td width="30px">
-            <img src="{{=URL('static', 'images/bedicons', args='bed_BY.png')}}" draggable="true">
-          </td>
-          <td>
-            {{=T('ready to use')}}
-          </td>
-        </tr>
+    <div class="col-lg-4">
+      <h4>Camas de baixo</h4>
+      <table class="table table-striped">
+        {{for i in bedroom.beds:}}
+          {{if i > 0:}}
+          <tr style="height: 6rem;">
+            <td width="50px">
+              <img width="35px" src="{{=URL('static', 'images/bedicons', args='bed_BN.png')}}"><br>
+            </td>
+            <td>
+              {{=guests[i]['name']}}
+              <br>
+              {{label = 'success'
+                if guests[i]['age']>35 and guests[i]['age']<60:
+                  label = 'warning'
+                elif guests[i]['age']>=60:
+                  label = 'danger'
+                pass}}
+              <span class="label label-{{=label}}" style="margin-right: 10px;">{{=guests[i]['age']}}</span>
+              {{if guests[i]['no_stairs']:}}
+                <img style="margin-right: 10px;" src="{{=URL('static', 'images/bedicons', args='NoStairs.png')}}" width="22px">
+              {{pass}}
+              {{if guests[i]['no_top_bunk']:}}
+                <img style="margin-right: 10px;" src="{{=URL('static', 'images/bedicons', args='NoTopBunks.png')}}" width="22px">
+              {{pass}}
+            </td>
+            <td>
+              <button type="button"
+                      class="btn btn-danger btn-xs pull-right"
+                      onclick="removeFromBedroom({{=i}})">
+                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+              </button>
+            </td>
+          </tr>
+          {{else:}}
+          <tr style="height: 6rem;">
+            <td width="50px">
+              <img width="35px" src="{{=URL('static', 'images/bedicons', args='bed_BY.png')}}" draggable="true">
+            </td>
+            <td>
+              {{=T('ready to use')}}<br>
+            </td>
+          </tr>
+          {{pass}}
         {{pass}}
-      {{pass}}
-    </table>
-  </div>
-  <div class="col-sm-6">
-    <table class="table table-striped">
-      <caption>{{=T('top bunks')}}</caption>
-      {{for i in bedroom.tops:}}
-        {{if i > 0:}}
-        <tr>
-          <td width="30px">
-            <img src="{{=URL('static', 'images/bedicons', args='bed_TN.png')}}" draggable="true">
-          </td>
-          <td>
-            {{=guests[i]['name']}}
-            <button type="button"
-                    class="btn btn-danger btn-xs pull-right"
-                    onclick="removeFromBedroom({{=i}})">
-              <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-            </button>
-            {{label = 'success'
-              if guests[i]['age']>35 and guests[i]['age']<60:
-                label = 'warning'
-              elif guests[i]['age']>=60:
-                label = 'danger'
-              pass}}
-            <span class="label label-{{=label}} pull-right" style="margin-right: 10px;">{{=guests[i]['age']}}</span>
-            {{if guests[i]['no_stairs']:}}
-            <img class="pull-right" style="margin-right: 10px;" src="{{=URL('static', 'images/bedicons', args='NoStairs.png')}}" width="22px">
-            {{pass}}
-            {{if guests[i]['no_top_bunk']:}}
-            <img class="pull-right" style="margin-right: 10px;" src="{{=URL('static', 'images/bedicons', args='NoTopBunks.png')}}" width="22px">
-            {{pass}}
-          </td>
-        </tr>
-        {{else:}}
-        <tr>
-          <td width="30px">
-            <img src="{{=URL('static', 'images/bedicons', args='bed_TY.png')}}" draggable="true">
-          </td>
-          <td>{{=T('ready to use')}}</td>
-        </tr>
+      </table>
+    </div>
+    <div class="col-lg-4">
+      <h4>Camas de cima</h4>
+      <table class="table table-striped">
+        {{for i in bedroom.tops:}}
+          {{if i > 0:}}
+          <tr style="height: 6rem;">
+            <td width="50px">
+              <img width="35px" src="{{=URL('static', 'images/bedicons', args='bed_TN.png')}}" draggable="true">
+            </td>
+            <td>
+              {{=guests[i]['name']}}
+              <br>
+              {{label = 'success'
+                if guests[i]['age']>35 and guests[i]['age']<60:
+                  label = 'warning'
+                elif guests[i]['age']>=60:
+                  label = 'danger'
+                pass}}
+              <span class="label label-{{=label}}" style="margin-right: 10px;">{{=guests[i]['age']}}</span>
+              {{if guests[i]['no_stairs']:}}
+                <img style="margin-right: 10px;" src="{{=URL('static', 'images/bedicons', args='NoStairs.png')}}" width="22px">
+              {{pass}}
+              {{if guests[i]['no_top_bunk']:}}
+                <img style="margin-right: 10px;" src="{{=URL('static', 'images/bedicons', args='NoTopBunks.png')}}" width="22px">
+              {{pass}}
+            </td>
+            <td>
+              <button type="button"
+                      class="btn btn-danger btn-xs pull-right"
+                      onclick="removeFromBedroom({{=i}})">
+                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+              </button>
+            </td>
+          </tr>
+          {{else:}}
+          <tr style="height: 6rem;">
+            <td width="50px">
+              <img width="35px" src="{{=URL('static', 'images/bedicons', args='bed_TY.png')}}" draggable="true">
+            </td>
+            <td>{{=T('ready to use')}}</td>
+          </tr>
+          {{pass}}
         {{pass}}
-      {{pass}}
-    </table>
-  </div>
+      </table>
+    </div>
   {{else:}}
-  <div class="col-sm-6">
-    <table class="table table-striped">
-      <caption>{{=T('beds')}}</caption>
-      {{for i in bedroom.beds:}}
-        {{if i > 0:}}
-        <tr>
-          <td width="30px">
-            <img src="{{=URL('static', 'images/bedicons', args='bed_N.png')}}" draggable="true">
-          </td>
-          <td>
-            {{=guests[i]['name']}}
-            <button type="button"
-                    class="btn btn-danger btn-xs pull-right"
-                    onclick="removeFromBedroom({{=i}})">
-              <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-            </button>
-            {{label = 'success'
-              if guests[i]['age']>35 and guests[i]['age']<60:
-                label = 'warning'
-              elif guests[i]['age']>=60:
-                label = 'danger'
-              pass}}
-            <span class="label label-{{=label}} pull-right" style="margin-right: 10px;">{{=guests[i]['age']}}</span>
-            {{if guests[i]['no_stairs']:}}
-            <img class="pull-right" style="margin-right: 10px;" src="{{=URL('static', 'images/bedicons', args='NoStairs.png')}}" width="22px">
-            {{pass}}
-            {{if guests[i]['no_top_bunk']:}}
-            <img class="pull-right" style="margin-right: 10px;" src="{{=URL('static', 'images/bedicons', args='NoTopBunks.png')}}" width="22px">
-            {{pass}}
-          </td>
-        </tr>
-        {{else:}}
-        <tr>
-          <td width="30px">
-            <img src="{{=URL('static', 'images/bedicons', args='bed_Y.png')}}" draggable="true">
-          </td>
-          <td>
-            {{=T('ready to use')}}
-          </td>
-        </tr>
+    <div class="col-lg-4">
+      <h4>Camas</h4>
+      <table class="table table-striped">
+        {{for i in bedroom.beds:}}
+          {{if i > 0:}}
+          <tr style="height: 6rem;">
+            <td width="50px">
+              <img width="35px" src="{{=URL('static', 'images/bedicons', args='bed_N.png')}}">
+            </td>
+            <td>
+              {{= guests[i]['name'] }}
+              <br>
+              {{label = 'success'
+                if guests[i]['age']>35 and guests[i]['age']<60:
+                  label = 'warning'
+                elif guests[i]['age']>=60:
+                  label = 'danger'
+                pass}}
+              <span class="label label-{{=label}}" style="margin-right: 10px;">{{=guests[i]['age']}}</span>
+              {{if guests[i]['no_stairs']:}}
+                <img style="margin-right: 10px;" src="{{=URL('static', 'images/bedicons', args='NoStairs.png')}}" width="22px">
+              {{pass}}
+              {{if guests[i]['no_top_bunk']:}}
+                <img style="margin-right: 10px;" src="{{=URL('static', 'images/bedicons', args='NoTopBunks.png')}}" width="22px">
+              {{pass}}
+            </td>
+            <td>
+              <button type="button"
+                      class="btn btn-danger btn-xs pull-right"
+                      onclick="removeFromBedroom({{=i}})">
+                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+              </button>
+            </td>
+          </tr>
+          {{else:}}
+          <tr style="height: 6rem;">
+            <td width="50px">
+              <img width="35px" src="{{=URL('static', 'images/bedicons', args='bed_Y.png')}}">
+            </td>
+            <td>
+              {{=T('ready to use')}}
+            </td>
+          </tr>
+          {{pass}}
         {{pass}}
-      {{pass}}
-    </table>
-  </div>
+      </table>
+    </div>
   {{pass}}
   {{if session.mapp.unallocateds:}}
-  {{include 'guests_unallocated.html'}}
+    {{include 'accommodations/elements/guests_unallocated.html'}}
   {{pass}}
 </div>
 
 <div id="confirm" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"></div>
 
 <style type="text/css">
-div .table {
+div table td {
+  line-height: 2.1rem !important;
   font-family: monospace;
+  font-weight: bold;
   font-size: 10pt;
 }
 </style>

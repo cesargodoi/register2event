@@ -1,26 +1,30 @@
 {{extend 'layout.html'}}
 
 {{block header}}
-<h2>{{=T('events')}}</h2>
-{{end}}
-
-{{block link_menu}}{{end}}
-
-{{block control_menu}}
-  {{=search}}
-  <div class="btn-group" role="group">
-    {{if auth.has_membership('root') or auth.has_membership('admin'):}}
-    <button type="button"
-            class="btn btn-primary"
-            onclick="window.open('{{=URL('new')}}', '_self')">
-      <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-    </button>
-    {{pass}}
-    <button type="button"
-            class="btn btn-info"
-            onclick="window.open('{{=URL('default', 'index')}}', '_self')">
-      <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
-    </button>
+  <div class="row">
+    <div class="col-md-5">
+      <h2>Eventos</h2>
+    </div>
+    <div class="col-md-7">
+      <br>
+      <div class="btn-group pull-right">
+        {{=search}}
+        {{if auth.has_membership('root') or auth.has_membership('admin'):}}
+          <button type="button"
+                  class="btn btn-primary"
+                  onclick="window.open('{{=URL('new')}}', '_self')">
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+            Adicionar
+          </button>
+        {{pass}}
+        <button type="button"
+                class="btn btn-info"
+                onclick="window.open('{{=URL('default', 'index')}}', '_self')">
+          <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+          Voltar
+        </button>
+      </div>
+    </div>
   </div>
 {{end}}
 

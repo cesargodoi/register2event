@@ -1,0 +1,58 @@
+{{if not payforms:}}
+<table class="table table-hover table-condensed" style="display: none">
+{{else:}}
+<table class="table table-hover table-condensed">
+{{pass}}
+  <caption>{{=T('payment forms')}}</caption>
+  <thead>
+    <tr>
+      <th width="5%">#</th>
+      <th width="10%">{{=T('type')}}</th>
+      <th width="30%">{{=T('details')}}</th>
+      <th width="40%"></th>
+      <th width="10%" class="text-right">{{=T('value')}} ({{=T('$')}})</th>
+      <th width="5%"></th>
+    </tr>
+  </thead>
+  <tbody>
+    {{frees = 0}}
+    {{for i, pf in enumerate(payforms):}}
+    <tr id="pf{{=i}}">
+      <th scope="row">{{=i+1}}</th>
+      <td>{{=pf.ptype}}</td>
+      {{if pf.ptype == 'FRE':
+            frees += 1
+        pass}}
+      {{if pf.ptype=="GSC":}}
+      <td>{{=GSC[int(pf.gscred)]}}</td>
+      <td><span class="label label-primary">{{=T('credit')}}</span></td>
+      {{else:}}
+      <td>{{=pf.bflagname}}</td><td>{{=pf.ctrl}}</td>
+      {{pass}}
+      <td class="text-right"><b>{{='%1.2f' % pf.value}}</b></td>
+      {{totalpay += float(pf.value)}}
+      <td>
+        {{if session.register.creddevol:}}
+          {{if pf.ptype not in ['DBT','CDT','DPT','TRF']:}}
+        <button type="button" class="btn btn-danger btn-xs" onclick="delPayform({{=i}});">
+          <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+        </button>
+          {{pass}}
+        {{else:}}
+        <button type="button" class="btn btn-danger btn-xs" onclick="delPayform({{=i}});">
+          <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+        </button>
+        {{pass}}
+      </td>
+    </tr>
+    {{pass}}
+    <tr>
+      <td colspan="3"></td>
+      <td  class="text-right"><strong>{{=T('DEBT')}}</strong></td>
+      <td>
+        <input class="form-control text-right" name="debt" id="debt" type="text"  style="width: 80px" disabled>
+      </td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>

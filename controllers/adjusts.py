@@ -3,66 +3,64 @@
 # @auth.requires_login()
 # @auth.requires(auth.has_membership('root'))
 # def adjust_bedroom_alt():
-#     print '------------------- adjust_bedroom_alt -------------------------'
+#     print('------------------- adjust_bedroom_alt -------------------------')
 #     reg_beds = [r.guesid for r in db(Register.evenid == 2).select() if r.bedroom]
 #     problems = [s.guesid for s in db(Guest_Stay).select() if s.guesid in reg_beds and not s.bedroom_alt]
 #     for p in problems:
-#         print p
-
+#         print(p)
 
 
 # @auth.requires_login()
 # @auth.requires(auth.has_membership('root'))
 # def adjust_payforms_by_registers():
-#     print '-------------- adjust_payforms_by_registers ---------------'
+#     print('-------------- adjust_payforms_by_registers ---------------')
 #     for user in db(db.auth_user).select():
-#         print 'USER:', user.first_name
-#         print 'ID:', user.id
+#         print('USER:', user.first_name)
+#         print('ID:', user.id)
 #         registers = db(Register.created_by==user.id).select(orderby=Register.id)
-#         print 'REGISTROS:', len(registers)
-#         print '-----------------------------------------------------------'
+#         print('REGISTROS:', len(registers))
+#         print('-----------------------------------------------------------')
 #         for r in registers:
 #             payforms = db((Payment_Form.id.belongs(r.payforms))).select()
 #             for p in payforms:
 #                 m2m = db((Register_Payment_Form.regid==r.id)&(Register_Payment_Form.payfid==p.id)).select()
 #                 if not m2m:
 #                     m2m2 = db(Register_Payment_Form.payfid==p.id).select()
-#                     print 'hospede:', r.guesid.name
-#                     print 'registro:', r.id, ' payforms:', r.payforms, ' multiplo?:', r.multiple
-#                     print 'não achamos ligação para:', r.id, ' e', p.id
+#                     print('hospede:', r.guesid.name)
+#                     print('registro:', r.id, ' payforms:', r.payforms, ' multiplo?:', r.multiple)
+#                     print('não achamos ligação para:', r.id, ' e', p.id)
 #                     if m2m2:
-#                         print 'no entanto achamos a(s) seguintes ligações:'
+#                         print('no entanto achamos a(s) seguintes ligações:')
 #                         for m2 in m2m2:
-#                             print 'id:', m2.id, 'reg:', m2.regid, 'pf:', m2.payfid
+#                             print('id:', m2.id, 'reg:', m2.regid, 'pf:', m2.payfid)
 #                             if not r.multiple:
-#                                 print 'vamos apagar esta ligação incorreta'
+#                                 print('vamos apagar esta ligação incorreta')
 #                         db(Register_Payment_Form.payfid == p.id).delete()
-#                         print 'vamos criar uma ligação nova para:'
-#                         print 'reg:', r.id, 'pf:', p.id, 'evenid:', r.evenid
-#                         print '-----------------------------------------------------------'
+#                         print('vamos criar uma ligação nova para:')
+#                         print('reg:', r.id, 'pf:', p.id, 'evenid:', r.evenid)
+#                         print('-----------------------------------------------------------')
 #                         db.register_payment_form.insert(regid=r.id, payfid=p.id, evenid=r.evenid)
 #                     else:
-#                         print 'vamos criar uma ligação nova para:'
-#                         print 'reg:', r.id, 'pf:', p.id, 'evenid:', r.evenid
-#                         print '-----------------------------------------------------------'
+#                         print('vamos criar uma ligação nova para:')
+#                         print('reg:', r.id, 'pf:', p.id, 'evenid:', r.evenid)
+#                         print('-----------------------------------------------------------')
 #                         db.register_payment_form.insert(regid=r.id, payfid=p.id, evenid=r.evenid)
-#
-#     print '----------------------- hard_adjust -----------------------'
+
+#     print('----------------------- hard_adjust -----------------------')
 #     hard_reg = db(Register.id.belongs([358, 359,360])).select(orderby=Register.id)
 #     n = 292
 #     for h in hard_reg:
-#         h.update_record(payforms=[long(n)])
+#         h.update_record(payforms=[int(n)])
 #         n += 1
 #     hard_pf = db(Payment_Form.id.belongs([313, 445, 446, 450, 451])).delete()
-#     print hard_pf
+#     print(hard_pf)
 #     hard_reg_pf = db(Register_Payment_Form.id.belongs([365,366,367])).select(orderby=Register_Payment_Form.id)
 #     n2 = 292
 #     for hrpf in hard_reg_pf:
-#         print hrpf.id, n2
-#         hrpf.update_record(payfid=long(n2))
+#         print(hrpf.id, n2)
+#         hrpf.update_record(payfid=int(n2))
 #         n2 += 1
-#     print '---------------------- thats right ------------------------'
-
+#     print('---------------------- thats right ------------------------')
 
 
 # @auth.requires_login()
@@ -84,7 +82,7 @@
 # @auth.requires_login()
 # @auth.requires(auth.has_membership('root'))
 # def adjust_kill_register():
-#     print '-------------- adjust_kill_register ---------------'
+#     print('-------------- adjust_kill_register ---------------')
 #     read = read_register(301) # TO DO --> request.vars.regid
 #     rids = [r.id for r in read.registers]
 #     pfids = [pf.id for pf in read.payforms]
@@ -95,27 +93,27 @@
 # @auth.requires_login()
 # @auth.requires(auth.has_membership('root'))
 # def adjust_registers_ps():
-#     print '-------------- adjust_registers_ps ---------------'
+#     print('-------------- adjust_registers_ps ---------------')
 #     registers = db(Register).select()
 #     for r in registers:
 #         gst = db((Guest_Stay.guesid==r.guesid) & (Guest_Stay.center==r.evenid.center)).select().first()
 #         if gst.ps or gst.description:
 #             r.update_record(ps=gst.ps, description=gst.description)
-#             print r.guesid, r.ps, r.description
-#             print '-->', gst.ps, gst.description
+#             print(r.guesid, r.ps, r.description)
+#             print('-->', gst.ps, gst.description)
 
 
 # @auth.requires_login()
 # @auth.requires(auth.has_membership('root'))
 # def adjust_m2m():
-#     print '-------------- adjust_m2m ---------------'
+#     print('-------------- adjust_m2m ---------------')
 #     m2m = db(Register_Payment_Form).select()
 #     for m in m2m:
 #         if Register[m.regid] and Payment_Form[m.payfid]:
-#             print 'm2m %s: certo' % m.id
+#             print('m2m %s: certo' % m.id)
 #         else:
-#             print 'm2m %s: errado <<<<' % m.id
-#     print 'temos %s m2m(s)' % len(m2m)
+#             print('m2m %s: errado <<<<' % m.id)
+#     print('temos %s m2m(s)' % len(m2m))
 
 
 # @auth.requires_login()
@@ -366,14 +364,14 @@
 # @auth.requires_login()
 # @auth.requires(auth.has_membership('root'))
 # def import_guests():
-#     print 'IMPORT GUESTS'
-#     print '-' * 80
-#     print '1 - reading the file...'
+#     print('IMPORT GUESTS')
+#     print('-' * 80)
+#     print('1 - reading the file...')
 #     import_file = open('applications/register2event/import_guests.csv','r')
 #     lines = import_file.readlines()
 #     import_file.close()
 #     error_file = open('applications/register2event/import_errors.csv','w')
-#     print '2 - try to insert in db'
+#     print('2 - try to insert in db')
 #     for line in lines:
 #         cur_line = line.split(',')
 #         new_guest = dict(
@@ -402,25 +400,24 @@
 #                 db.guest.insert(**new_guest)
 #             except:
 #                 error_file.write(line)
-#                 print 'error - %s' % cur_line[2]
+#                 print('error - %s' % cur_line[2])
 #         else:
-#             print cur_line[3], 'ja inserido'
+#             print(cur_line[3], 'ja inserido')
 #     error_file.close()
-#     print 'well done!'
-
+#     print('well done!')
 
 
 # @auth.requires_login()
 # @auth.requires(auth.has_membership('root'))
 # def import_bedrooms():
-#     print 'IMPORT BEDROOMS'
-#     print '-' * 80
-#     print '1 - reading the file...'
+#     print('IMPORT BEDROOMS')
+#     print('-' * 80)
+#     print('1 - reading the file...')
 #     import_file = open('applications/register2event/ccpa-aloj.csv','r')
 #     lines = import_file.readlines()
 #     import_file.close()
 #     error_file = open('applications/register2event/import_errors.csv','w')
-#     print '2 - try to insert in db'
+#     print('2 - try to insert in db')
 #     for line in lines:
 #         cur_line = line.split(',')
 #         new_bedroom = dict(
@@ -436,5 +433,49 @@
 #             db.bedroom.insert(**new_bedroom)
 #         except:
 #             error_file.write(line)
-#             print 'error - %s' % cur_line[2]
-#     print 'well done!'
+#             print('error - %s' % cur_line[2])
+#     print('well done!')
+
+
+# @auth.requires_login()
+# @auth.requires(auth.has_membership("root"))
+# def adj_guest_stay_step_1():
+#     print("-----  ADJUST GUEST STAY STEP 1  -----")
+#     stays = db(Guest_Stay).select()
+#     count = 0
+#     with open("applications/register2event/stay_refactor.csv", "w") as f:
+#         f.write("id,bedroom,bedroom_alt\n")
+#         for stay in stays:
+#             f.write(f"{stay.id},{stay.bedroom},{stay.bedroom_alt}\n")
+#             count += 1
+
+#     print(f"{count} registros copiados.")
+#     print("well done!")
+
+
+# @auth.requires_login()
+# @auth.requires(auth.has_membership("root"))
+# def adj_guest_stay_step_2():
+#     from csv import DictReader
+
+#     print("-----  ADJUST GUEST STAY STEP 2  -----")
+#     count = 0
+#     with open("applications/register2event/stay_refactor.csv", "r") as f:
+#         csv_dict_reader = DictReader(f)
+#         for row in csv_dict_reader:
+#             stay = Guest_Stay[row["id"]]
+#             print(f"a-> {stay.id} b: {stay.bedroom} ba: {stay.bedroom_alt}")
+#             stay.bedroom = (
+#                 int(row["bedroom"]) if row["bedroom"] != "None" else None
+#             )
+#             stay.bedroom_alt = (
+#                 int(row["bedroom_alt"])
+#                 if row["bedroom_alt"] != "None"
+#                 else None
+#             )
+#             stay.update_record()
+#             print(f"d-> {stay.id} b: {stay.bedroom} ba: {stay.bedroom_alt}\n")
+#             count += 1
+
+#     print(f"{count} registros copiados.")
+#     print("well done!")

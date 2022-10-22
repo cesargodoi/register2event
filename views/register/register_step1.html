@@ -1,50 +1,67 @@
 {{extend 'layout.html'}}
 
-{{block control_menu}}
-<form class="navbar-form">
-  <div class="form-group">
-    <input type="text" id="guest" name="guest" style="width: 220px"
-      class="form-control" placeholder="{{=T('enter the guest name')}}"
-      onclick="jQuery('#guest').val('');jQuery('#suggestions').show();" />
-    <div style="position: absolute; z-index:300" id="suggestions" class="suggestions text-left"></div>
+{{block header}}
+  <div class="row">
+    <div class="col-md-5">
+      <h3>
+        {{if gencredit:}}
+          Gerar Crédito&nbsp;<small>&nbsp;&nbsp;&nbsp;{{=T('step')}} 1 - selecione um hospede</small>
+        {{else:}}
+          Registro&nbsp;<small>&nbsp;&nbsp;&nbsp;{{=T('step')}} 1 - selecione um hospede</small>
+        {{pass}}
+      </h3>
+    </div>
+    <div class="col-md-7">
+      <div class="pull-right">
+        <form class="navbar-form">
+          <div class="form-group has-success has-feedback">
+            <input type="text" id="guest" name="guest" style="width: 220px"
+              class="form-control" placeholder="{{=T('enter the guest name')}}"
+              onclick="jQuery('#guest').val('');jQuery('#suggestions').show();" />
+            <div style="position: absolute; z-index:300" id="suggestions" class="suggestions text-left"></div>
+            <span class="glyphicon glyphicon-search form-control-feedback" aria-hidden="true"></span>
+          </div>
+          <div class="btn-group">
+            <a class="btn btn-primary" href="{{=URL('guest','new', vars={'reg':True})}}">
+              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+              Inserir novo
+            </a>
+            <button type="button" class="btn btn-info" onclick="window.open('{{=URL('events','show', vars={'evenid':evenid})}}', '_self')">
+              <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+              Voltar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
-  <div class="btn-group">
-    <a class="btn btn-info" onclick="get_guest()">
-      <span class="glyphicon glyphicon-search" aria-hidden="true"></a>
-    <a class="btn btn-primary" href="{{=URL('guest','new', vars={'reg':True})}}">
-      <span class="glyphicon glyphicon-plus" aria-hidden="true"></a>
-    <button type="button" class="btn btn-info" onclick="window.open('{{=URL('events','show', vars={'evenid':evenid})}}', '_self')">
-      <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
-    </button>
-  </div>
-</form>
 {{end}}
 
 <!-- modal -->
 <div id="show_guest" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="shoGuest"></div>
 
 <style>
-#suggestions { position: relative; }
-.suggestions { background: white; border: solid 1px #55A6C8; }
-.suggestions DIV { padding: 2px 4px; }
+  #suggestions { position: relative; }
+  .suggestions { background: white; border: solid 1px #55A6C8; }
+  .suggestions DIV { padding: 2px 4px; }
 </style>
 
 <script type="text/javascript">
-jQuery("#guest").focus();
-jQuery("#guest").keyup(function(){
-  ajax("{{=URL('register', 'guest_selector')}}", ['guest'], 'suggestions');
-});
+  jQuery("#guest").focus();
+  jQuery("#guest").keyup(function(){
+    ajax("{{=URL('register', 'guest_selector')}}", ['guest'], 'suggestions');
+  });
 
-// function get_guest() {
-//   ajax("{{=URL('register', 'confirm_guest')}}", ['guest'], target='show_guest');
-//   ajax("{{=URL('register', 'confirm_guest')}}", ['guest'], ':eval');
-//   jQuery('#show_guest').modal('show');
-// }
+  // function get_guest() {
+  //   ajax("{{=URL('register', 'confirm_guest')}}", ['guest'], target='show_guest');
+  //   ajax("{{=URL('register', 'confirm_guest')}}", ['guest'], ':eval');
+  //   jQuery('#show_guest').modal('show');
+  // }
 
-function include(id) {
-  ajax("{{=URL('register', 'include_guest')}}?guest="+id, [], ':eval');
-    window.location.replace("{{=URL('register', 'register_step2')}}");
-};
+  function include(id) {
+    ajax("{{=URL('register', 'include_guest')}}?guest="+id, [], ':eval');
+      window.location.replace("{{=URL('register', 'register_step2')}}");
+  };
 
-function goBack() {window.open("{{=URL('events','show', vars={'evenid':evenid})}}", '_self')};
+  function goBack() {window.open("{{=URL('events','show', vars={'evenid':evenid})}}", '_self')};
 </script>

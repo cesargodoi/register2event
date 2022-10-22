@@ -1,0 +1,51 @@
+<table class="table table-hover table-condensed">
+  <caption>Hospedes e valores</caption>
+  <thead>
+    <tr>
+      <th width="5%">#</th>
+      <th width="30%">{{=T('guest')}}</th>
+      <th width="50%"></th>
+      <th width="10%" class="text-right">{{=T('value')}} ({{=T('$')}})</th>
+      <th width="5%"></th>
+    </tr>
+  </thead>
+  <tbody>
+    {{js_vars = []
+      js_to_update = []
+      totalpay = 0.
+      for n, guest in enumerate(guests):
+        var = 'amount%s' % str(n+1)
+        to_update = '%s.name,%s.value' % (var, var)
+        js_vars.append(var)
+        js_to_update.append(to_update)
+    }}
+    <tr>
+      <th scope="row">{{=n+1}}</th>
+      <td>{{=shortname(guest.name)}}</td>
+      <td>
+        {{if guest.credit:}}
+        <span class="label label-primary">${{=guest.credit}}</span>
+        {{pass}}
+      </td>
+      <td>
+        <input class="form-control text-right" name="{{=guest.guesid}}" id="amount{{=str(n+1)}}" type="text" value="{{=guest.amount}}" onblur="newEntry(this,{{=guest.guesid}});toConclude();" style="width: 80px">
+      </td>
+      <td>
+        {{if len(guests)>1:}}
+        <button type="button" class="btn btn-danger btn-xs" onclick="delGuest({{=guest.guesid}});">
+          <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+        </button>
+        {{pass}}
+      </td>
+    </tr>
+    {{pass}}
+    <tr>
+      <td colspan="2"></td>
+      <td class="text-right"><strong>TOTAL</strong></td>
+      <td>
+        <input class="form-control text-right" name="total" id="total" type="text"  style="width: 80px" disabled>
+      </td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>

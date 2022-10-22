@@ -169,7 +169,7 @@ def register_step2():
 
 
 def updt_amount():
-    Reg.updt_amount(long(request.vars.guesid), float(request.vars.amount))
+    Reg.updt_amount(int(request.vars.guesid), float(request.vars.amount))
 
 
 def del_guest():
@@ -244,43 +244,11 @@ def conclude():
         if event_type == "SCF":
             is_scf = True
             if guest_stay.bedroom_alt:
-                mapping = (
-                    db(Bedrooms_mapping.evenid == conclude.evenid)
-                    .select(orderby=Bedrooms_mapping.id)
-                    .first()
-                )
-                bedroom = [
-                    m
-                    for m in mapping.bedrooms
-                    if m[0] == guest_stay.bedroom_alt
-                ][0]
-                if gues.guesid not in (bedroom[1] + bedroom[2]):
-                    attempt = bed_or_top(
-                        gues.guesid, guest_stay.no_top_bunk, bedroom
-                    )
-                    if attempt:
-                        mapping.update_record(bedrooms=mapping.bedrooms)
-                    else:
-                        guest_stay.update_record(bedroom_alt=None)
+                try_to_allocate(conclude.evenid, guest_stay, gues, alt=True)
         else:
             is_scf = False
             if guest_stay.bedroom:
-                mapping = (
-                    db(Bedrooms_mapping.evenid == conclude.evenid)
-                    .select(orderby=Bedrooms_mapping.id)
-                    .first()
-                )
-                bedroom = [
-                    m for m in mapping.bedrooms if m[0] == guest_stay.bedroom
-                ][0]
-                if gues.guesid not in (bedroom[1] + bedroom[2]):
-                    attempt = bed_or_top(
-                        gues.guesid, guest_stay.no_top_bunk, bedroom
-                    )
-                    if attempt:
-                        mapping.update_record(bedrooms=mapping.bedrooms)
-                    else:
-                        guest_stay.update_record(bedroom=None)
+                try_to_allocate(conclude.evenid, guest_stay, gues)
         # prepare registers to insert
         new_register = Reg.dict_register(
             conclude, gues, guest_stay, guests, payforms_ids, is_scf
@@ -301,29 +269,51 @@ def conclude():
     redirect(URL("events", "show", vars={"evenid": conclude.evenid}))
 
 
-###############################################################################
-def bed_or_top(guesid, no_top_bunk, bedroom, attempt=False):
-    if no_top_bunk:
-        if 0 in bedroom[1]:
-            bedroom[1].remove(0)
-            bedroom[1].append(guesid)
-            bedroom[1].sort(reverse=True)
-            attempt = True
+# helper try to allocate ######################################################
+def try_to_allocate(evenid, stay, guest, alt=False):
+    mapping = (
+        db(Bedrooms_mapping.evenid == evenid)
+        .select(orderby=Bedrooms_mapping.id)
+        .first()
+    )
+    # choose bedroom or bedroom_alt
+    if alt:
+        bedroom = [m for m in mapping.bedrooms if m[0] == stay.bedroom_alt][0]
     else:
+        bedroom = [m for m in mapping.bedrooms if m[0] == stay.bedroom][0]
+    # checking if the guest can up stairs
+    if stay.no_stairs and bedroom[4] != 0:
+        if alt:
+            stay.update_record(bedroom_alt=None)
+        else:
+            stay.update_record(bedroom=None)
+    # the guest cannot sleep in an upper bed and there is no lower bed
+    elif stay.no_top_bunk and 0 not in bedroom[1]:
+        if alt:
+            stay.update_record(bedroom_alt=None)
+        else:
+            stay.update_record(bedroom=None)
+    # the guest cannot sleep in an upper bed and there is lower bed
+    elif stay.no_top_bunk and 0 in bedroom[1]:
+        bedroom[1].remove(0)
+        bedroom[1].append(guest.guesid)
+        mapping.update_record(bedrooms=mapping.bedrooms)
+    # the guest has no restrictions
+    elif guest.guesid not in (bedroom[1] + bedroom[2]) and 0 in (
+        bedroom[1] + bedroom[2]
+    ):
         if 0 in bedroom[2]:
             bedroom[2].remove(0)
-            bedroom[2].append(guesid)
-            bedroom[2].sort(reverse=True)
-            attempt = True
+            bedroom[2].append(guest.guesid)
         elif 0 in bedroom[1]:
             bedroom[1].remove(0)
-            bedroom[1].append(guesid)
-            bedroom[1].sort(reverse=True)
-            attempt = True
-    return attempt
-
-
-###############################################################################
+            bedroom[1].append(guest.guesid)
+        mapping.update_record(bedrooms=mapping.bedrooms)
+    else:
+        if alt:
+            stay.update_record(bedroom_alt=None)
+        else:
+            stay.update_record(bedroom=None)
 
 
 # edit stay
@@ -404,6 +394,7 @@ def edit_stay():
             guest_stay.update_record(**new_stay)
         adjust_bedroom_mapp(register.evenid)
         redirect(URL("events", "show", vars={"evenid": register.evenid}))
+
     return dict(form=edit, register=register)
 
 

@@ -1,4 +1,5 @@
 from datetime import date
+from importlib.metadata import requires
 from gluon.storage import Storage
 
 
@@ -297,3 +298,86 @@ def get_bedroom(evenid, guesid):
         else:
             bedroom = None
     return bedroom
+
+
+def get_guest_stay(guesid, stay_id=False, centid=None, edit=False):
+    if stay_id:
+        stay = Guest_Stay[stay_id]
+    elif edit:
+        stay = (
+            db((Guest_Stay.guesid == guesid) & (Guest_Stay.center == centid))
+            .select()
+            .first()
+        )
+    else:
+        stay = False
+
+    form = SQLFORM.factory(
+        Field(
+            "stay_id",
+            "integer",
+            default=stay.id if stay else None,
+            label=T("id"),
+        ),
+        Field(
+            "guesid",
+            "integer",
+            default=guesid,
+            label=T("guesid"),
+        ),
+        Field(
+            "center",
+            requires=IS_IN_DB(db, "center.id", center_repr),
+            default=stay.center if stay else None,
+            label=T("center"),
+        ),
+        Field(
+            "lodge",
+            requires=IS_IN_SET(LODGE_TYPES),
+            default=stay.lodge if stay else "LDG",
+            label=T("lodge"),
+        ),
+        Field(
+            "arrival_date",
+            requires=IS_IN_SET(ARRIVAL_DATE),
+            default=stay.arrival_date if stay else "D1",
+            label=T("arrival date"),
+        ),
+        Field(
+            "arrival_time",
+            requires=IS_IN_SET(ARRIVAL_TIME),
+            default=stay.arrival_time if stay else "BL",
+            label=T("arrival time"),
+        ),
+        Field(
+            "no_stairs",
+            "boolean",
+            default=stay.no_stairs if stay else None,
+            label=T("no stairs"),
+        ),
+        Field(
+            "no_top_bunk",
+            "boolean",
+            default=stay.no_top_bunk if stay else None,
+            label=T("no top bunk"),
+        ),
+        Field(
+            "staff",
+            requires=IS_EMPTY_OR(IS_IN_SET(STAFFS)),
+            default=stay.staff if stay else "KIT",
+            label=T("staff"),
+        ),
+        Field("ps", "text", default=stay.ps if stay else None, label=T("ps")),
+        Field(
+            "description",
+            "text",
+            default=stay.description if stay else None,
+            label=T("outras tarefas"),
+        ),
+        Field("up_date", "boolean", label=T("update stay")),
+        submit_button="Update" if edit else "Add",
+    )
+    form.element(_name="description")["_rows"] = 1
+    form.element(_name="ps")["_rows"] = 1
+    form.element(_type="submit")["_class"] = "btn btn-primary btn-lg"
+    return form
