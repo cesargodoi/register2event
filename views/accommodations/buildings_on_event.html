@@ -13,16 +13,18 @@
           <strong><a href="#" onclick="updateMapping({{=event.id}});">{{=T('fix it')}}?</a></strong>
         </span>
       {{pass}}
-      <button 
-        type="button"
-        class="btn pull-right"
-        data-toggle="modal"
-        data-target="#confirm"
-        onclick="#"
-      >
-        <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
-        Gerenciar não alocados
-      </button>
+      {{if guests_unallocated:}}
+        <button 
+          type="button"
+          class="btn pull-right"
+          data-toggle="modal"
+          data-target="#confirm"
+          onclick="#"
+        >
+          <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+          Gerenciar não alocados
+        </button>
+      {{pass}}
     </div>
   </div>
 {{end}}
@@ -44,13 +46,15 @@
 
 <div 
   id="confirm" 
-  class="modal fade bs-example-modal-sm" 
+  class="modal fade" 
   tabindex="-1" 
   role="dialog" 
   aria-labelledby="myModalLabel" 
   aria-hidden="true"
 >
-  <!-- aqui vai o conteúdo -->
+  <div class="modal-dialog">
+    {{ include 'accommodations/elements/guests_unallocated.html' }}
+  </div>
 </div>
 
 <script type="text/javascript">
