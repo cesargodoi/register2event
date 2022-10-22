@@ -11,12 +11,18 @@
          http://google.com/webmasters -->
     <meta name="google-site-verification" content="">
     <!-- include stylesheets -->
-    <link rel="stylesheet" href="{{=URL('static','css/bootstrap.min.css')}}"/>
-    <link rel="stylesheet" href="{{=URL('static','css/bootstrap-theme.min.css')}}"/>
-    <link rel="stylesheet" href="{{=URL('static','css/web2py-bootstrap3.css')}}"/>
-    <link rel="stylesheet" href="{{=URL('static','css/bootstrap-callout.css')}}"/>
-    <link rel="shortcut icon" href="{{=URL('static','images/favicon.ico')}}" type="image/x-icon">
-    <link rel="apple-touch-icon" href="{{=URL('static','images/favicon.png')}}">
+    <link rel="stylesheet" href="{{= URL('static','css/bootstrap.min.css') }}"/>
+    <link rel="stylesheet" href="{{= URL('static','css/bootstrap-theme.min.css') }}"/>
+    <link rel="stylesheet" href="{{= URL('static','css/web2py-bootstrap3.css') }}"/>
+    <link rel="stylesheet" href="{{= URL('static','css/bootstrap-callout.css') }}"/>
+    <link rel="stylesheet" href="{{= URL('static','css/r2e.css') }}"/>
+    
+    <link rel="shortcut icon" href="{{= URL('static','images/favicon.ico') }}" type="image/x-icon">
+    <link rel="apple-touch-icon" href="{{= URL('static','images/favicon.png') }}">
+
+    <!-- Bootstrap 5.1 icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    
     <!-- All JavaScript at the bottom, except for Modernizr which enables
          HTML5 elements & feature detects -->
     <script src="{{=URL('static','js/modernizr-2.8.3.min.js')}}"></script>
@@ -43,7 +49,7 @@
     {{if not auth.user and 'appadmin' not in request.url.split('/'):}}
       <style type="text/css">
         body {
-          background-color: #eee;
+          background-color: #8d896e42;
         }
         .form-signin {
           max-width: 500px;

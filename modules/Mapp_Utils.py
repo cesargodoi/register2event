@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# bedroom = [id, beds, top_bunks, gender, floor, name]
+
 from gluon import *
 
 # kill bedroom mapping
@@ -200,6 +202,10 @@ def gen_mapp_buildings(rows):
             + len([x for x in row.mapp[1] if x != 0])
         )
     return (total, in_use, (total - in_use))
+
+
+def get_total_per_building(bedrooms):
+    return [sum(col) for col in zip(*bedrooms)]
 
 
 def gen_mapp_building(rows):

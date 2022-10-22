@@ -36,6 +36,7 @@ def buildings_on_event():
     buildings = db(
         Building.id.belongs(set([b.builid for b in bedrooms]))
     ).select()
+
     for building in buildings:
         building.male = Mapp.gen_mapp_buildings(
             [
@@ -44,6 +45,7 @@ def buildings_on_event():
                 if b.gender == "M" and b.builid == building.id
             ]
         )
+
         building.female = Mapp.gen_mapp_buildings(
             [
                 b
@@ -51,6 +53,7 @@ def buildings_on_event():
                 if b.gender == "F" and b.builid == building.id
             ]
         )
+
         building.mixed = Mapp.gen_mapp_buildings(
             [
                 b
@@ -58,6 +61,10 @@ def buildings_on_event():
                 if b.gender == "X" and b.builid == building.id
             ]
         )
+        building.total = Mapp.get_total_per_building(
+            [building.male, building.female, building.mixed]
+        )
+
     _unallocated = session.mapp.unallocateds
     _unallocated.sort(key=lambda r: r["name"])
     return dict(rows=buildings, guests_unallocated=_unallocated, event=event)
@@ -74,6 +81,7 @@ def building_on_event():
     # verifying if session.mapp exists
     if not session.mapp:
         redirect(URL("events", "show", vars={"evenid": request.vars.evenid}))
+
     # geting event to render details
     event = Events[request.vars.evenid]
     # get bedrooms
@@ -81,8 +89,10 @@ def building_on_event():
         (Bedroom.id.belongs(session.mapp.ids_in_mapping))
         & (Bedroom.builid == request.vars.builid)
     ).select(orderby=Bedroom.builid)
+
     for bedroom in bedrooms:
         bedroom.mapp = Mapp.add_mapp(bedroom.id)
+
     # geting the building
     building = Building[request.vars.builid]
     building.male = Mapp.gen_mapp_building(
@@ -164,7 +174,7 @@ def bedroom_on_event():
     bedroom.beds = mapp[1]
     bedroom.tops = mapp[2]
     # creating a dict of name
-    _ids = [x for x in bedroom[1] + bedroom[2] if x != 0]
+    _ids = [x for x in bedroom.beds + bedroom.tops if x != 0]
     guests = {
         r.guesid: dict(
             name=shortname(r.guesid.name),
