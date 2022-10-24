@@ -33,14 +33,14 @@ Guest = db.define_table(
     "guest",
     Field("center", "reference center", notnull=True),
     Field("enrollment", length=9),
-    Field("name", notnull=True, length=50),
+    Field("name", notnull=True, length=50, required=True),
     Field("name_sa"),
     Field("id_card", length=40),
     Field("gender", default="M", length=1),
-    Field("birthday", "date"),
-    Field("city", length=40),
-    Field("state_prov", length=2),
-    Field("country", length=30),
+    Field("birthday", "date", notnull=True, required=True),
+    Field("city", length=40, notnull=True, required=True),
+    Field("state_prov", length=2, notnull=True, required=True),
+    Field("country", length=30, notnull=True, required=True),
     Field("aspect", default=""),
     Field("email", length=100),
     Field("cell_phone", length=15),
@@ -57,7 +57,11 @@ Guest.name.requires = IS_NOT_EMPTY()
 Guest.name_sa.compute = lambda row: "%s" % des(row.name)
 Guest.gender.requires = IS_IN_SET(GENDER)
 Guest.aspect.requires = IS_EMPTY_OR(IS_IN_SET(ASPECTS))
-Guest.birthday.requires = IS_EMPTY_OR(IS_DATE(format="%d/%m/%Y"))
+Guest.birthday.requires = IS_NOT_EMPTY()
+Guest.birthday.requires = IS_DATE(format="%d/%m/%Y")
+Guest.city.requires = IS_NOT_EMPTY()
+Guest.state_prov.requires = IS_NOT_EMPTY()
+Guest.country.requires = IS_NOT_EMPTY()
 Guest.credit.requires = IS_DECIMAL_IN_RANGE(None, None, dot=".")
 
 
