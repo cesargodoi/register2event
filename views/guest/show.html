@@ -1,40 +1,26 @@
 {{extend 'layout.html'}}
+
 {{block header}}
-  <h3>{{=guest.name}} <small><a href="mailto:{{=guest.email}}">{{=guest.email}}</a></small></h3>
+  <div class="row">
+    <div class="col-md-5">
+      <h3>{{=guest.name}} <small><a href="mailto:{{=guest.email}}">{{=guest.email}}</a></small></h3>
+    </div>
+    <div class="col-md-7">
+      <br>
+      <div class="btn-group pull-right">
+        <button type="button" class="btn btn-info" onclick="window.open('{{=URL('list')}}','_self');">
+          <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+          Voltar
+        </button>
+      </div>
+    </div>
+  </div>
 {{end}}
-
-{{block control_menu}}
-  <button type="button"
-          class="btn btn-info"
-          onclick="window.open('{{=URL('list')}}','_self');">
-    <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
-    Voltar
-  </button>
-{{end}}
-
-{{block link_menu}}
-{{end}}
-
 
 <div class="row">
   <div class='col-sm-2'>
     <br />
-    <div>
-      <center>
-      {{if guest.gender=='M':}}
-        <img style="width: 160px;" src="{{=URL('static', 'images', args='spm.png')}}">
-      {{else:}}
-        <img style="width: 160px;" src="{{=URL('static', 'images', args='spf.png')}}">
-      {{pass}}
-      {{if guest.enrollment or guest.aspect:}}
-      <h4>
-      {{if guest.enrollment:}}{{=guest.enrollment}} {{pass}}
-      {{if guest.enrollment and guest.aspect:}} - {{pass}}
-      {{if guest.aspect:}}{{=ASPECTS[guest.aspect]}}{{pass}}
-      </h4>
-      {{pass}}
-      </center>
-    </div>
+    {{ include 'guest/elements/guest_image.html' }}
   </div>
   <div class="col-sm-10">
     <div class="bs-example bs-example-tabs" data-example-id="togglable-tabs">
@@ -50,216 +36,41 @@
       <div id="myTabContent" class="tab-content">
         <div role="tabpanel" class="tab-pane fade " id="home" aria-labelledby="home-tab">
           <br />
-          <table class="table table-condensed table-hover">
-            <tr>
-              <th width="25%">{{=T('center')}}</th>
-              <td>{{=guest.center.center}} - {{=guest.center.city}} ({{=guest.center.country}})</td>
-            </tr>
-            <tr>
-              <th>{{=T('live in')}}</th>
-              <td>{{=guest.city}} - {{=guest.state_prov}} - {{=guest.country}}</td>
-            </tr>
-            {{if guest.id_card:}}
-            <tr>
-              <th>{{=T('id card')}}</th>
-              <td>{{=guest.id_card}}</td>
-            </tr>
-            {{pass}}
-            {{if guest.birthday:}}
-            <tr>
-              <th>{{=T('birthday')}}</th>
-              <td>{{=guest.birthday.strftime('%d/%m/%y')}} &nbsp;&nbsp;&nbsp;{{=guest.age}} {{=T('years')}}</td>
-            </tr>
-            {{pass}}
-            {{if guest.cell_phone:}}
-            <tr>
-              <th>{{=T('cell')}}</th>
-              <td>{{=phone_format(guest.cell_phone)}}</td>
-            </tr>
-            {{pass}}
-            {{if guest.sos_contact:}}
-            <tr>
-              <th>{{=T('sos contact')}}</th>
-              <td>{{=guest.sos_contact}}</td>
-            </tr>
-            {{pass}}
-            {{if guest.sos_phone:}}
-            <tr>
-              <th>{{=T('sos phone')}}</th>
-              <td>{{=phone_format(guest.sos_phone)}}</td>
-            </tr>
-            {{pass}}
-            {{if guest.ps:}}
-            <tr>
-              <th>{{=T('ps')}}</th>
-              <td>{{=guest.ps}}</td>
-            </tr>
-            {{pass}}
-            {{if auth.has_membership('root') or auth.has_membership('admin') or auth.has_membership('office'):}}
-            <tr>
-              <th colspan="2">
-                <button type="button"
-                        class="btn btn-warning"
-                        onclick="window.open('{{=URL('guest','edit', vars={'guesid':guest.id})}}', '_self')">
-                  <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-                </button>
-              </th>
-            </tr>
-            {{pass}}
-          </table>
+          {{ include 'guest/elements/guest_info.html' }}
         </div>
 
         <div role="tabpanel" class="tab-pane fade " id="stay" aria-labelledby="stay-tab">
           <br />
           {{if stays:}}
-          <table class="table table-condensed table-hover" style="font-family:monospace; font-size: 8pt;">
-            <thead>
-              <tr>
-                <th width="3%">#</th>
-                <th width="7%">{{=T('center')}}</th>
-                <th width="9%">{{=T('lodge')}}</th>
-                <th width="22%">{{=T('arrival')}}</th>
-                <th width="16%">{{=T('restrictions')}}</th>
-                <th width="19%">{{=T('staff')}}</th>
-                <th width="19%">{{=T('ps')}}</th>
-                <th width="5%"></th>
-              </tr>
-            </thead>
-            <tbody>
-            {{for n, stay in enumerate(stays):}}
-              <tr>
-                <th>{{=n+1}}</th>
-                <td data-toggle="tooltip" data-placement="top" data-container="body" title="{{=center_repr % stay.center}}">{{=center_abbr % stay.center}}</td>
-                <td>
-                  <span class="label label-primary">
-                    {{=LODGE_TYPES[stay.lodge]}}
-                  </span>
-                </td>
-                <td>{{=ARRIVAL_DATE[stay.arrival_date]}}, {{=ARRIVAL_TIME[stay.arrival_time]}}</td>
-                <td>
-                  {{if stay.no_stairs:}}<span class="label label-danger">escadas</span>{{pass}}
-                  {{if stay.no_top_bunk:}}<span class="label label-danger">cama de cima</span>{{pass}}
-                </td>
-                <td>
-                  {{if stay.staff:}}
-                  <span class="label label-info">
-                    {{=STAFFS[stay.staff]}}
-                  </span>
-                  {{if stay.description:}}
-                  <span class="text-primary"
-                        data-toggle="tooltip"
-                        data-placement="top"
-                        data-container="body"
-                        title="{{=stay.description}}">&nbsp;{{=stay.description[:12]}}</span>
-                  {{pass}}
-                  {{pass}}
-                </td>
-                <td>
-                  {{if stay.ps:}}
-                  <span class="text-danger" data-toggle="tooltip" data-placement="top" data-container="body" title="{{=stay.ps}}">{{=stay.ps[:20]}}</span>
-                  {{pass}}
-                </td>
-                <td>
-                  <div class="btn-group btn-group-xs" role="group" aria-label="...">
-                    <button type="button"
-                            class="btn btn-warning btn-xs"
-                            onclick="window.open('{{=URL('guest', 'edit_stay', vars={'stayid':stay.id, 'guest_id':stay.guesid})}}', '_self')">
-                      <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            {{pass}}
-            <tr>
-              <th colspan="8">
-                <button type="button"
-                        class="btn btn-primary pull-right"
-                        onclick="window.open('{{=URL('new_stay', vars={'guest_id':stay.guesid})}}', '_self')">
-                  <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Add
-                </button>
-              </th>
-            </tr>
-            </tbody>
-
-          </table>
+            {{ include 'guest/elements/guest_stays.html' }}
           {{else:}}
-          <div class="alert alert-warning">
-            <h4>Nenhuma <b>{{=T('stay')}}</b> pra ser exibida!</h4>
-            <p>
-              Inclua uma <b>{{=T('stay')}}</b>, ou contate o Administrador do Sistema caso não tenha permissão para isso.
-            </p>
-          </div>
-          <div>
-            <button type="button"
-                    class="btn btn-primary"
-                    onclick="window.open('{{=URL('new_stay', vars={'guest_id':guest.id})}}', '_self')">
-              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-            </button>
-          </div>
+            <div class="alert alert-warning">
+              <h4>Nenhuma <b>{{=T('stay')}}</b> pra ser exibida!</h4>
+              <p>
+                Inclua uma <b>{{=T('stay')}}</b>, ou contate o Administrador do Sistema caso não tenha permissão para isso.
+              </p>
+            </div>
+            <div>
+              <button type="button"
+                      class="btn btn-primary"
+                      onclick="window.open('{{=URL('new_stay', vars={'guest_id':guest.id})}}', '_self')">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+              </button>
+            </div>
           {{pass}}
         </div>
         {{if credit_log:}}
-        <div role="tabpanel" class="tab-pane" id="credit" aria-labelledby="credit-tab">
-          <br />
-          <div class="row">
-            <div class='col-sm-2 text-center'>
-              <span class="text-primary" style="font-size: 18pt;"><b>{{=T('$')}}{{=guest.credit}}</b></span>
-            </div>
-            <div class='col-sm-10'>
-              <table class="table table-condensed table-hover" style="font-family:monospace; font-size: 9pt;">
-                <caption>{{=T('historic')}}</caption>
-                {{for log in credit_log:}}
-                <tr>
-                  <td>{{=log.created_on.strftime('%d/%m/%y %H:%M:%S')}}</td>
-                  <td><strong>{{=log.credit}}</strong></td>
-                  <td><strong>{{=CRED_OPER[log.oper].upper()}}</strong></td>
-                  <td><code style="font-family: monospace;">{{=log.credit_log}}</code></td>
-                </tr>
-                {{pass}}
-              </table>
-            </div>
+          <div role="tabpanel" class="tab-pane" id="credit" aria-labelledby="credit-tab">
+            <br />
+            {{ include 'guest/elements/guest_credit.html' }}
           </div>
-        </div>
         {{pass}}
 
         {{if historic:}}
-        <div role="tabpanel" class="tab-pane fade " id="history" aria-labelledby="history-tab">
-          <br />
-          <table class="table table-condensed table-hover" style="font-family:monospace; font-size: 9pt;">
-            <thead>
-              <tr>
-                <th>{{=T('date')}}</th>
-                <th>{{=T('event')}}</th>
-                <th colspan="3">{{=T('details')}}</th>
-                <th class="text-right">{{=T('amount')}} $</th>
-              </tr>
-            </thead>
-            <tbody>
-            {{for n, hist in enumerate(historic):}}
-            {{if hist.credit:}}
-              <tr data-toggle="modal" data-target="#confirm" onclick="regInfo({{=hist.id}});" class="text-primary">
-                <td>{{=hist.evenid.start_date.strftime('%Y/%B')}}</td>
-                <td>{{=hist.evenid.activity.activity}} - {{=hist.evenid.center.shortname}} {{=hist.evenid.center.city}}({{=hist.evenid.center.country}})</td>
-                <td colspan="3">{{=T('credit launched')}}</td>
-                <td class="text-right"><b>{{=hist.amount}}</b></td>
-              </tr>
-            {{else:}}
-              <tr data-toggle="modal" data-target="#confirm" onclick="regInfo({{=hist.id}});">
-                <td>{{=hist.evenid.start_date.strftime('%Y/%B')}}</td>
-                <td>{{=hist.evenid.activity.activity}} - {{=hist.evenid.center.shortname}} {{=hist.evenid.center.city}}({{=hist.evenid.center.country}})</td>
-                <td>{{=LODGE_TYPES[hist.lodge]}}</td>
-                <td>
-                  {{if hist.no_stairs:}}<span class="label label-danger">escadas</span>{{pass}}
-                  {{if hist.no_top_bunk:}}<span class="label label-danger">cama de cima</span>{{pass}}
-                </td>
-                <td>{{=ARRIVAL_DATE[hist.arrival_date]}} {{=ARRIVAL_TIME[hist.arrival_time]}}</td>
-                <td class="text-right">{{=hist.amount}}</td>
-              </tr>
-            {{pass}}
-            {{pass}}
-            </tbody>
-          </table>
-        </div>
+          <div role="tabpanel" class="tab-pane fade " id="history" aria-labelledby="history-tab">
+            <br />
+            {{ include 'guest/elements/guest_historic.html' }}
+          </div>
         {{pass}}
       </div>
     </div>
@@ -269,19 +80,23 @@
 <div id="confirm" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"></div>
 
 <script type="text/javascript">
-$(document).ready(function(){
-    presentation("{{=tab_pres}}");
-    $('[data-toggle="tooltip"]').tooltip();
-});
-function presentation(tab){
-  document.getElementById('pres_'+tab).className = "active";
-  document.getElementById(tab).className = "tab-pane fade active in";
-}
-function goBack() {history.go(-1)};
-function moreInfo(regid){
-  ajax("{{=URL('reports', 'stay_more_info')}}/"+regid, [], 'confirm');
-}
-function regInfo(regid){
-  ajax("{{=URL('reports', 'register_info')}}/"+regid, [], 'confirm');
-}
+  $(document).ready(function(){
+      presentation("{{=tab_pres}}");
+      $('[data-toggle="tooltip"]').tooltip();
+  });
+
+  function presentation(tab){
+    document.getElementById('pres_'+tab).className = "active";
+    document.getElementById(tab).className = "tab-pane fade active in";
+  }
+
+  function goBack() {history.go(-1)};
+
+  function moreInfo(regid){
+    ajax("{{=URL('reports', 'stay_more_info')}}/"+regid, [], 'confirm');
+  }
+  
+  function regInfo(regid){
+    ajax("{{=URL('reports', 'register_info')}}/"+regid, [], 'confirm');
+  }
 </script>

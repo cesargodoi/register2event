@@ -1,0 +1,18 @@
+<div class="row">
+  <div class='col-sm-2 text-center'>
+    <span class="text-primary" style="font-size: 18pt;"><b>{{=T('$')}}{{=guest.credit}}</b></span>
+  </div>
+  <div class='col-sm-10'>
+    <table class="table table-condensed table-hover" style="font-family:monospace; font-size: 9pt;">
+      <caption>{{=T('historic')}}</caption>
+      {{for log in credit_log:}}
+      <tr>
+        <td>{{=log.created_on.strftime('%d/%m/%y %H:%M:%S')}}</td>
+        <td><strong>{{=log.credit}}</strong></td>
+        <td><strong>{{=CRED_OPER[log.oper].upper()}}</strong></td>
+        <td><code style="font-family: monospace;">{{=log.credit_log}}</code></td>
+      </tr>
+      {{pass}}
+    </table>
+  </div>
+</div>

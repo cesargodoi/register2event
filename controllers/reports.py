@@ -27,10 +27,13 @@ def cash_balance():
     form.element("button")["_class"] = "btn btn-success btn-lg"
     form.element(_type="submit")["_class"] = "btn btn-primary btn-lg"
     form.element(_type="submit")["_onclick"] = (
-        "dayBalance(document.getElementById('no_table_days').value,%s);" % event.id
+        "dayBalance(document.getElementById('no_table_days').value,%s);"
+        % event.id
     )
     if form.process().accepted:
-        redirect(URL("reports", "show_cash_balance", vars=dict(**request.vars)))
+        redirect(
+            URL("reports", "show_cash_balance", vars=dict(**request.vars))
+        )
     return dict(form=form)
 
 
@@ -194,7 +197,9 @@ def payment_by_guest():
         if gsc:
             GSCs.append(gsc)
         _gsc = [
-            (int(pf.id), float(pf.amount), pf.credit) for pf in payforms if pf.credit
+            (int(pf.id), float(pf.amount), pf.credit)
+            for pf in payforms
+            if pf.credit
         ]
         if _gsc:
             GSCs.append(_gsc)
@@ -248,7 +253,9 @@ def register_info():
     payforms, registers = read.payforms, read.registers
     guests, pays = [], []
     title = (
-        T("credit launch details") if registers[0].credit else T("subscription details")
+        T("credit launch details")
+        if registers[0].credit
+        else T("subscription details")
     )
     for n, reg in enumerate(registers):
         num = n + 1
@@ -360,10 +367,10 @@ def locate_payment_form():
         ),
         Field("ctrl", label=T("control")),
         Field("amount", label=T("$")),
-        submit_button=T("locate"),
+        buttons=[],
     )
+    search["_id"] = "form"
     search.element(_name="ctrl")["_placeholder"] = T("control number")
-    search.element(_type="submit")["_class"] = "btn btn-primary btn-lg"
     if search.process().accepted:
         if (
             request.vars.bflag
@@ -380,7 +387,9 @@ def locate_payment_form():
                 ctrl = "%%%s%%" % request.vars.ctrl.lower()
                 queries.append((Payment_Form.num_ctrl.lower().like(ctrl)))
             if request.vars.amount:
-                queries.append((Payment_Form.amount == float(request.vars.amount)))
+                queries.append(
+                    (Payment_Form.amount == float(request.vars.amount))
+                )
             query = reduce(lambda a, b: (a & b), queries)
             results = db(query).select()
             return dict(search=search, results=results)
@@ -406,7 +415,9 @@ def summary_to_print():
         if reg.is_active and not reg.credit:
             stay_dict = dict(
                 payforms=[
-                    pf.pay_type for pf in payment_form if reg.guesid in pf.guests
+                    pf.pay_type
+                    for pf in payment_form
+                    if reg.guesid in pf.guests
                 ],
                 guesid=reg.guesid,
                 name=reg.guesid.name,
@@ -436,7 +447,9 @@ def to_stn():
     response.view = "reports/link.html"
     evenid = request.vars.evenid
     event = Events[evenid]
-    regists = db((Register.evenid == evenid) & (Register.credit == False)).select()
+    regists = db(
+        (Register.evenid == evenid) & (Register.credit == False)
+    ).select()
     registers = [r for r in regists if r.guesid.center == auth.user.center]
     pupils = []
     for r in sorted(registers, key=lambda k: k.guesid.name_sa):
@@ -457,12 +470,11 @@ def to_stn():
         csv_file.write("MATRIC.,NOME,VALOR (R$)\n")
         for p in pupils:
             row = f"{str(p.enroll)},{str(p.name)},{p.value}\n"
-            print(row)
             csv_file.write(row)
 
     link = A(T("get your file"), _href=URL("static", "docs/" + filename))
 
-    return dict(link=link)
+    return dict(filename=filename, link=link)
 
 
 # frequencies
@@ -476,7 +488,9 @@ def frequencies():
     response.view = "reports/link.html"
     evenid = request.vars.evenid
     event = Events[evenid]
-    regists = db((Register.evenid == evenid) & (Register.credit == False)).select()
+    regists = db(
+        (Register.evenid == evenid) & (Register.credit == False)
+    ).select()
     registers = [r for r in regists if r.guesid.center == auth.user.center]
     pupils, guests = [], []
     for r in sorted(registers, key=lambda k: k.guesid.name_sa):
@@ -514,7 +528,7 @@ def frequencies():
 
     link = A(T("get your file"), _href=URL("static", "docs/" + filename))
 
-    return dict(link=link)
+    return dict(filename=filename, link=link)
 
 
 #  admin reports
@@ -882,7 +896,9 @@ def guests_per_meals():
 
     return dict(
         event=event,
-        conf_days=conf_days(event.start_date.weekday(), event.end_date.weekday()),
+        conf_days=conf_days(
+            event.start_date.weekday(), event.end_date.weekday()
+        ),
         rows=len(rows),
         meals=meals,
         guests_out=guests_out,

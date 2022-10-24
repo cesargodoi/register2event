@@ -1,0 +1,23 @@
+{{ onOff = 'primary' if row.is_active else 'danger' }}
+<div 
+  id="{{= row.id }}"
+  class="card text-{{= onOff }}" 
+  onclick="window.open('{{=URL('show_building', vars={'builid':row.id})}}', '_self')"
+  style="width: 25rem; height: auto;"
+>
+  <div class="text-center mt-2">
+    <i class="bi bi-building h1"></i>
+  </div>
+  <div class="card-body text-center">
+    <h4 class="card-title">{{= row.building }}</h4>
+    <small class="text-center">{{=center_abbr % row.center}}</small>
+    <table class="table table-sm" style="margin-top: 1rem;">
+      <tr>
+        <th class="text-center">total de leitos</th>
+      </tr>
+      <tr>
+        <th class="text-center" style="font-size:2rem;">{{= row.total }}</th>
+      </tr>
+    </table>
+  </div>
+</div>

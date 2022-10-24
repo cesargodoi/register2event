@@ -17,6 +17,10 @@
   border-radius: 0.75rem;
 }
 
+.card:hover {
+  background-color: #efefef;
+}
+
 .breadcrumb {
   padding: 8px 15px;
   margin-bottom: 20px;

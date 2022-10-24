@@ -192,12 +192,10 @@
 </style>
 
 <script type="text/javascript">
-function addToBedroom(gid) {
-  var ev = {{=event.id}};
-  if (confirm("{{=T('Are you sure')}}?")) {
-    ajax(`{{=URL('accommodations', 'choose_a_bedroom')}}?evenid=${ev}&guesid=${gid}`, [], ':eval');
+  function addToBedroom(gid) {
+    var ev = {{=event.id}};
+    if (confirm("{{=T('Are you sure')}}?")) {
+      ajax(`{{=URL('accommodations', 'choose_a_bedroom')}}?evenid=${ev}&guesid=${gid}`, [], ':eval');
+    }
   }
-}
-
-function goBack() {history.go(-1)};
 </script>

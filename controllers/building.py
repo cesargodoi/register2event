@@ -19,18 +19,15 @@ def list_buildings():
             & (Building.is_active == True)
         )
     # searching on database
-    buildings = db(query).select(orderby=Building.center)
+    buildings = db(query).select(orderby=[Building.center, Building.building])
+
     for building in buildings:
-        # counting and separating by gender (beds + topbunks)
-        building.male = sum(
-            [b.beds for b in building.bedroom.select() if b.gender == "M"]
-        ) + sum([b.top_bunks for b in building.bedroom.select() if b.gender == "M"])
-        building.fema = sum(
-            [b.beds for b in building.bedroom.select() if b.gender == "F"]
-        ) + sum([b.top_bunks for b in building.bedroom.select() if b.gender == "F"])
-        building.mixd = sum(
-            [b.beds for b in building.bedroom.select() if b.gender == "X"]
-        ) + sum([b.top_bunks for b in building.bedroom.select() if b.gender == "X"])
+        building.total = sum(
+            [sum([b.beds, b.top_bunks]) for b in building.bedroom.select()]
+        )
+
+    # buildings = buildings.sort(key=lambda r: r["id"])
+
     return dict(rows=buildings)
 
 
@@ -39,20 +36,25 @@ def list_buildings():
 @auth.requires(auth.has_membership("root") or auth.has_membership("admin"))
 def new_building():
     # creating a form
-    new = SQLFORM(Building, submit_button="add")
+    new = SQLFORM(Building, buttons=[])
+    new["_id"] = "form"
     # adjusting the form (by permission types)
     if auth.has_membership("root"):
-        new.element("option", _value=int(auth.user.center))["_selected"] = "selected"
+        new.element("option", _value=int(auth.user.center))[
+            "_selected"
+        ] = "selected"
     elif auth.user.center:
         new.element(_id="building_center__row")["_style"] = "display:none;"
-        new.element("option", _value=int(auth.user.center))["_selected"] = "selected"
+        new.element("option", _value=int(auth.user.center))[
+            "_selected"
+        ] = "selected"
         new.element(_id="building_is_active__row")["_style"] = "display:none;"
     new.element(_name="description")["_rows"] = 1
-    new.element(_type="submit")["_class"] = "btn btn-primary btn-lg"
     if new.process().accepted:
         # select the new builid and redirect to show new building
         builid = int(new.process().vars.id)
         redirect(URL("show_building", vars={"builid": builid}))
+
     return dict(form=new)
 
 
@@ -75,20 +77,27 @@ def show_building():
 @auth.requires(auth.has_membership("root") or auth.has_membership("admin"))
 def edit_building():
     # creating a form
-    edit = SQLFORM(Building, request.vars.builid, submit_button="update")
+    edit = SQLFORM(Building, request.vars.builid, buttons=[])
+    edit["_id"] = "form"
     # adjusting the form (by permission types)
     if auth.has_membership("root"):
         edit.element(_id="building_id__row")["_style"] = "display:none;"
-        edit.element("option", _value=int(auth.user.center))["_selected"] = "selected"
+        edit.element("option", _value=int(auth.user.center))[
+            "_selected"
+        ] = "selected"
     elif auth.user.center:
         edit.element(_id="building_id__row")["_style"] = "display:none;"
         edit.element(_id="building_center__row")["_style"] = "display:none;"
-        edit.element("option", _value=int(auth.user.center))["_selected"] = "selected"
+        edit.element("option", _value=int(auth.user.center))[
+            "_selected"
+        ] = "selected"
     edit.element(_name="description")["_rows"] = 1
-    edit.element(_type="submit")["_class"] = "btn btn-primary btn-lg"
     if edit.process().accepted:
         # redirect to show this building
-        redirect(URL("show_building", vars={"builid": int(edit.process().vars.id)}))
+        redirect(
+            URL("show_building", vars={"builid": int(edit.process().vars.id)})
+        )
+
     return dict(form=edit, builid=request.vars.builid)
 
 

@@ -5,13 +5,13 @@
 @auth.requires_login()
 @auth.requires(auth.has_membership("root") or auth.has_membership("admin"))
 def new():
-    new = SQLFORM(Events, submit_button="add")
+    new = SQLFORM(Events, buttons=[])
     if auth.has_membership("admin"):
         new.element(_id="events_center__row")["_style"] = "display:none;"
         new.element("option", _value=int(auth.user.center))[
             "_selected"
         ] = "selected"
-    new.element(_type="submit")["_class"] = "btn btn-primary btn-lg"
+    new["_id"] = "form"
     new.element(_name="description")["_rows"] = 1
     if new.process().accepted:
         from gluon.custom_import import track_changes
@@ -31,10 +31,10 @@ def new():
 def edit():
     evenid = request.vars.evenid
     event = Events[evenid] or redirect(URL("list"))
-    edit = SQLFORM(Events, event.id, submit_button="update")
+    edit = SQLFORM(Events, event.id, buttons=[])
+    edit["_id"] = "form"
     edit.element(_id="events_id__row")["_style"] = "display:none;"
     edit.element(_name="description")["_rows"] = 1
-    edit.element(_type="submit")["_class"] = "btn btn-primary btn-lg"
     if edit.process().accepted:
         redirect(URL("show", vars={"evenid": evenid}))
     return dict(form=edit, event=evenid)

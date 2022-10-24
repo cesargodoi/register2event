@@ -375,9 +375,9 @@ def get_guest_stay(guesid, stay_id=False, centid=None, edit=False):
             label=T("outras tarefas"),
         ),
         Field("up_date", "boolean", label=T("update stay")),
-        submit_button="Update" if edit else "Add",
+        buttons=[],
     )
+    form["_id"] = "form"
     form.element(_name="description")["_rows"] = 1
     form.element(_name="ps")["_rows"] = 1
-    form.element(_type="submit")["_class"] = "btn btn-primary btn-lg"
     return form

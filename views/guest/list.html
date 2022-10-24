@@ -15,8 +15,8 @@
             Adicionar
           </button>
         {{pass}}
-        <button type="button" class="btn btn-info" onclick="goBack()">
-          <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+        <button type="button" class="btn btn-info" onclick="window.open('{{= URL('default', 'index') }}', '_self')">
+          <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
           Voltar
         </button>
       </div>
@@ -36,10 +36,6 @@
 
   {{ include 'paginator.html' }}
 {{ pass }}
-
-<script type="text/javascript">
-  function goBack() {history.go(-1)};
-</script>
 
 <style type="text/css">
   .my_row { 

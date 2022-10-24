@@ -243,21 +243,20 @@ div table td {
 </style>
 
 <script type="text/javascript">
-function addToBedroom(gid, rid){
-  var bd = {{=bedroom.id}};
-  var gn = '{{=bedroom.gender}}';
-  var ev = {{=event.id}};
-  if (confirm("{{=T('Are you sure')}}?")) {
-    ajax(`{{=URL('accommodations', 'add_to_bedroom')}}?evenid=${ev}&bedroomid=${bd}&guesid=${gid}&regid=${rid}&gender=${gn}`, [], ':eval');
+  function addToBedroom(gid, rid){
+    var bd = {{=bedroom.id}};
+    var gn = '{{=bedroom.gender}}';
+    var ev = {{=event.id}};
+    if (confirm("{{=T('Are you sure')}}?")) {
+      ajax(`{{=URL('accommodations', 'add_to_bedroom')}}?evenid=${ev}&bedroomid=${bd}&guesid=${gid}&regid=${rid}&gender=${gn}`, [], ':eval');
+    }
   }
-}
 
-function removeFromBedroom(gs){
-  var bd = {{=bedroom.id}};
-  var ev = {{=event.id}};
-  if (confirm("{{=T('Are you sure')}}?")) {
-    ajax(`{{=URL('accommodations', 'remove_from_bedroom')}}?evenid=${ev}&bedroomid=${bd}&guesid=${gs}`, [], ':eval');
+  function removeFromBedroom(gs){
+    var bd = {{=bedroom.id}};
+    var ev = {{=event.id}};
+    if (confirm("{{=T('Are you sure')}}?")) {
+      ajax(`{{=URL('accommodations', 'remove_from_bedroom')}}?evenid=${ev}&bedroomid=${bd}&guesid=${gs}`, [], ':eval');
+    }
   }
-}
-
 </script>
