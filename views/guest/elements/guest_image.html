@@ -1,0 +1,14 @@
+<div>
+  <center>
+    {{if guest.gender=='M':}}
+      <img style="width: 160px;" src="{{=URL('static', 'images', args='spm.png')}}">
+    {{else:}}
+      <img style="width: 160px;" src="{{=URL('static', 'images', args='spf.png')}}">
+    {{pass}}
+    {{if guest.aspect:}}
+      <h4>
+        {{=ASPECTS[guest.aspect]}}
+      </h4>
+    {{pass}}
+  </center>
+</div>

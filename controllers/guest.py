@@ -9,7 +9,8 @@
     or auth.has_membership("office")
 )
 def new():
-    new = SQLFORM(Guest, submit_button="add")
+    new = SQLFORM(Guest, buttons=[])
+    new["_id"] = "form"
     if auth.has_membership("root") or auth.has_membership("admin"):
         new.element("option", _value=int(auth.user.center))[
             "_selected"
@@ -22,7 +23,6 @@ def new():
     if not auth.has_membership("root"):
         new.element(_id="guest_credit__row")["_style"] = "display:none;"
     new.element(_name="ps")["_rows"] = 1
-    new.element(_type="submit")["_class"] = "btn btn-primary btn-lg"
     if new.process().accepted:
         guesid = int(new.process().vars.id)
         if request.vars.reg:
@@ -40,12 +40,12 @@ def new():
 )
 def edit():
     guesid = request.vars.guesid
-    edit = SQLFORM(Guest, guesid, submit_button="update")
+    edit = SQLFORM(Guest, guesid, buttons=[])
+    edit["_id"] = "form"
     edit.element(_id="guest_id__row")["_style"] = "display:none;"
     if auth.has_membership("root"):
         edit.element(_id="guest_credit__row")["_style"] = "display:none;"
     edit.element(_name="ps")["_rows"] = 1
-    edit.element(_type="submit")["_class"] = "btn btn-primary btn-lg"
     if edit.process().accepted:
         if request.vars.on_reg:
             redirect(URL("register", "confirm_guest", vars={"guesid": guesid}))
@@ -141,7 +141,6 @@ def stay_adjust_to_view(form, centid=None, edit=False):
     form.element(_id="no_table_guesid__row")["_style"] = "display:none;"
     form.element(_id="no_table_description__row")["_style"] = "display:none;"
     form.element(_name="ps")["_rows"] = 1
-    form.element(_type="submit")["_class"] = "btn btn-primary btn-lg"
     if edit and auth.has_membership("root") or auth.has_membership("admin"):
         form.element(_id="no_table_description__row")[
             "_style"

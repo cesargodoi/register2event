@@ -149,7 +149,7 @@ def unallocateds(evenid):
             no_top_bunk=reg.no_top_bunk,
             age=(date.today() - reg.guesid.birthday).days // 365
             if reg.guesid.birthday
-            else "",
+            else 0,
             regid=int(reg.id),
         )
         guests_unallocated.append(_guest)

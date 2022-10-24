@@ -1,0 +1,58 @@
+<table class="table table-condensed table-hover">
+  <tr>
+    <th width="25%">{{=T('center')}}</th>
+    <td>{{=guest.center.center}} - {{=guest.center.city}} ({{=guest.center.country}})</td>
+  </tr>
+  <tr>
+    <th>{{=T('live in')}}</th>
+    <td>{{=guest.city}} - {{=guest.state_prov}} - {{=guest.country}}</td>
+  </tr>
+  {{if guest.id_card:}}
+  <tr>
+    <th>{{=T('id card')}}</th>
+    <td>{{=guest.id_card}}</td>
+  </tr>
+  {{pass}}
+  {{if guest.birthday:}}
+  <tr>
+    <th>{{=T('birthday')}}</th>
+    <td>{{=guest.birthday.strftime('%d/%m/%y')}} &nbsp;&nbsp;&nbsp;{{=guest.age}} {{=T('years')}}</td>
+  </tr>
+  {{pass}}
+  {{if guest.cell_phone:}}
+  <tr>
+    <th>{{=T('cell')}}</th>
+    <td>{{=phone_format(guest.cell_phone)}}</td>
+  </tr>
+  {{pass}}
+  {{if guest.sos_contact:}}
+  <tr>
+    <th>{{=T('sos contact')}}</th>
+    <td>{{=guest.sos_contact}}</td>
+  </tr>
+  {{pass}}
+  {{if guest.sos_phone:}}
+  <tr>
+    <th>{{=T('sos phone')}}</th>
+    <td>{{=phone_format(guest.sos_phone)}}</td>
+  </tr>
+  {{pass}}
+  {{if guest.ps:}}
+  <tr>
+    <th>{{=T('ps')}}</th>
+    <td>{{=guest.ps}}</td>
+  </tr>
+  {{pass}}
+  {{if auth.has_membership('root') or auth.has_membership('admin') or auth.has_membership('office'):}}
+  <tr>
+    <th colspan="2">
+      <button type="button"
+              class="btn btn-warning pull-right"
+              onclick="window.open('{{=URL('guest','edit', vars={'guesid':guest.id})}}', '_self')">
+        <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+        Editar
+      </button>
+    </th>
+  </tr>
+  {{pass}}
+</table>

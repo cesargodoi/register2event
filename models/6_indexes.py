@@ -17,5 +17,5 @@ indexes = [
     # "CREATE INDEX IF NOT EXISTS building__center ON building (center);",
 ]
 
-for index in indexes:
-    db.executesql(index)
+# for index in indexes:
+#     db.executesql(index)

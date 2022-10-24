@@ -1,97 +1,101 @@
 {{extend 'layout.html'}}
 
 {{block header}}
-<div class="row">
-  <div class="col-sm-6">
-    <h3>
-      <strong>{{=T('delete record')}}</strong>&nbsp;&nbsp;
-    </h3>
+  <div class="row">
+    <div class="col-md-5">
+      <h3>{{=T('delete record')}}</h3>
+    </div>
+    <div class="col-md-7">
+      <br>
+      <div class="btn-group pull-right">
+        {{ if info: }}
+          <button type="button"
+                  class="btn btn-success"
+                  onclick="window.open('{{=URL('kill_them_all')}}', '_self')">
+            <span class="glyphicon glyphicon-search" aria-hidden="true"></span> 
+            Nova busca
+          </button>
+          {{ if (registers or payforms) and (event_status == 'OPN'): }}
+            <button type="button"
+                    class="btn btn-danger"
+                    onclick="killRegister({{=number}})">
+              <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> 
+              Apagar registro(s)
+            </button>
+          {{pass}}
+        {{ else: }}
+        {{ include 'next_button.html' }}
+        {{ pass }}
+        <button type="button" 
+                class="btn btn-info" 
+                onclick="window.open('{{=URL('default', 'index')}}', '_self')">
+          <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+          Voltar
+        </button>
+      </div>
+    </div>
   </div>
-</div>
 {{end}}
 
-{{block control_menu}}
-<div class="btn-group" role="group">
-    {{if info:}}
-    <button type="button"
-            class="btn btn-success"
-            onclick="window.open('{{=URL('kill_them_all')}}', '_self')">
-      <span class="glyphicon glyphicon-search" aria-hidden="true"></span> nova busca
-    </button>
-    {{if (registers or payforms) and (event_status == 'OPN'):}}
-    <button type="button"
-            class="btn btn-danger"
-            onclick="killRegister({{=number}})">
-      <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> apagar registro(s)
-    </button>
-    {{pass}}
-    {{pass}}
-    <button type="button"
-            class="btn btn-info"
-            onclick="window.open('{{=URL('default', 'index')}}', '_self')">
-      <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
-    </button>
-  </div>
-{{end}}
 
 {{if not info:}}
-{{=search}}
+  {{=search}}
 {{else:}}
-<div class="row">
-    {{if event:}}
-    <h3>{{=event}}</h3>
-        {{if event_status == 'CLS':}}
-        <div class="alert alert-danger">
-            O(s) registro(s) não pode(m) ser apagado(s) - Evento Encerrado.
-        </div>
-        {{pass}}
-    {{pass}}
-    <h4>{{=title}}</h4>
-    {{if registers:}}
-    <div class="col-sm-6">
-        <table class="table table-condensed">
-            <caption>registro(s)</caption>
-            <tr class="text-muted">
-                <th>id</th>
-                <th>nome</th>
-                <th>valor (R$)</th>
-                <th>ativo?</th>
-            </tr>
-            {{for r in registers:}}
-            <tr>
-                <td>{{=r[0]}}</td>
-                <td>{{=r[1]}}</td>
-                <td>{{=r[2]}}</td>
-                <td>{{=r[3]}}</td>
-            </tr>
-            {{pass}}
-        </table>
-    </div>
-    {{pass}}
-    {{if payforms:}}
-    <div class="col-sm-6">
-        <table class="table table-condensed">
-            <caption>forma(s) de pagamento</caption>
-            <tr class="text-muted">
-                <th>id</th>
-                <th>tipo</th>
-                <th>descrição</th>
-                <th>valor (R$)</th>
-                <th>ativo?</th>
-            </tr>
-            {{for p in payforms:}}
-            <tr>
-                <td>{{=p[0]}}</td>
-                <td>{{=p[1]}}</td>
-                <td>{{=p[2]}} {{=p[3]}}</td>
-                <td>{{=p[4]}}</td>
-                <td>{{=p[5]}}</td>
-            </tr>
-            {{pass}}
-        </table>
-    </div>
-    {{pass}}
-</div>
+  <div class="row">
+      {{if event:}}
+      <h3>{{=event}}</h3>
+          {{if event_status == 'CLS':}}
+          <div class="alert alert-danger">
+              O(s) registro(s) não pode(m) ser apagado(s) - Evento Encerrado.
+          </div>
+          {{pass}}
+      {{pass}}
+      <h4>{{=title}}</h4>
+      {{if registers:}}
+      <div class="col-sm-6">
+          <table class="table table-condensed">
+              <caption>registro(s)</caption>
+              <tr class="text-muted">
+                  <th>id</th>
+                  <th>nome</th>
+                  <th>valor (R$)</th>
+                  <th>ativo?</th>
+              </tr>
+              {{for r in registers:}}
+              <tr>
+                  <td>{{=r[0]}}</td>
+                  <td>{{=r[1]}}</td>
+                  <td>{{=r[2]}}</td>
+                  <td>{{=r[3]}}</td>
+              </tr>
+              {{pass}}
+          </table>
+      </div>
+      {{pass}}
+      {{if payforms:}}
+      <div class="col-sm-6">
+          <table class="table table-condensed">
+              <caption>forma(s) de pagamento</caption>
+              <tr class="text-muted">
+                  <th>id</th>
+                  <th>tipo</th>
+                  <th>descrição</th>
+                  <th>valor (R$)</th>
+                  <th>ativo?</th>
+              </tr>
+              {{for p in payforms:}}
+              <tr>
+                  <td>{{=p[0]}}</td>
+                  <td>{{=p[1]}}</td>
+                  <td>{{=p[2]}} {{=p[3]}}</td>
+                  <td>{{=p[4]}}</td>
+                  <td>{{=p[5]}}</td>
+              </tr>
+              {{pass}}
+          </table>
+      </div>
+      {{pass}}
+  </div>
 {{pass}}
 
 <script type="text/javascript">

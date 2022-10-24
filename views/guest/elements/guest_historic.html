@@ -1,0 +1,34 @@
+<table class="table table-condensed table-hover" style="font-family:monospace; font-size: 9pt;">
+  <thead>
+    <tr>
+      <th>{{=T('date')}}</th>
+      <th>{{=T('event')}}</th>
+      <th colspan="3">{{=T('details')}}</th>
+      <th class="text-right">{{=T('amount')}} $</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{for n, hist in enumerate(historic):}}
+  {{if hist.credit:}}
+    <tr data-toggle="modal" data-target="#confirm" onclick="regInfo({{=hist.id}});" class="text-primary">
+      <td>{{=hist.evenid.start_date.strftime('%Y/%B')}}</td>
+      <td>{{=hist.evenid.activity.activity}} - {{=hist.evenid.center.shortname}} {{=hist.evenid.center.city}}({{=hist.evenid.center.country}})</td>
+      <td colspan="3">{{=T('credit launched')}}</td>
+      <td class="text-right"><b>{{=hist.amount}}</b></td>
+    </tr>
+  {{else:}}
+    <tr data-toggle="modal" data-target="#confirm" onclick="regInfo({{=hist.id}});">
+      <td>{{=hist.evenid.start_date.strftime('%Y/%B')}}</td>
+      <td>{{=hist.evenid.activity.activity}} - {{=hist.evenid.center.shortname}} {{=hist.evenid.center.city}}({{=hist.evenid.center.country}})</td>
+      <td>{{=LODGE_TYPES[hist.lodge]}}</td>
+      <td>
+        {{if hist.no_stairs:}}<span class="label label-danger">escadas</span>{{pass}}
+        {{if hist.no_top_bunk:}}<span class="label label-danger">cama de cima</span>{{pass}}
+      </td>
+      <td>{{=ARRIVAL_DATE[hist.arrival_date]}} {{=ARRIVAL_TIME[hist.arrival_time]}}</td>
+      <td class="text-right">{{=hist.amount}}</td>
+    </tr>
+  {{pass}}
+  {{pass}}
+  </tbody>
+</table>
