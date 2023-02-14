@@ -8,9 +8,7 @@ def new():
     new = SQLFORM(Events, buttons=[])
     if auth.has_membership("admin"):
         new.element(_id="events_center__row")["_style"] = "display:none;"
-        new.element("option", _value=int(auth.user.center))[
-            "_selected"
-        ] = "selected"
+        new.element("option", _value=int(auth.user.center))["_selected"] = "selected"
     new["_id"] = "form"
     new.element(_name="description")["_rows"] = 1
     if new.process().accepted:
@@ -103,13 +101,9 @@ def list():
             renderstyle=False,
         )
     paginator.records = db(qry).count()
-    paginate_info = PaginateInfo(
-        paginator.page, paginator.paginate, paginator.records
-    )
+    paginate_info = PaginateInfo(paginator.page, paginator.paginate, paginator.records)
 
-    rows = db(qry).select(
-        orderby=~Events.start_date, limitby=paginator.limitby()
-    )
+    rows = db(qry).select(orderby=~Events.start_date, limitby=paginator.limitby())
     for r in rows:
         r.guests = db(
             (Register.evenid == r.id)
@@ -231,9 +225,7 @@ def show():
         gquery = Guest.id.belongs(ids)
     else:
         like_term = des("%%%s%%" % term.lower())
-        gquery = (Guest.name_sa.lower().like(like_term)) & (
-            Guest.id.belongs(ids)
-        )
+        gquery = (Guest.name_sa.lower().like(like_term)) & (Guest.id.belongs(ids))
 
     # paginator
     from paginator import Paginator, PaginateSelector, PaginateInfo
@@ -246,16 +238,10 @@ def show():
         renderstyle=False,
     )
     paginator.records = db(gquery).count()
-    paginate_info = PaginateInfo(
-        paginator.page, paginator.paginate, paginator.records
-    )
-    rows = db(gquery).select(
-        orderby=Guest.name_sa, limitby=paginator.limitby()
-    )
+    paginate_info = PaginateInfo(paginator.page, paginator.paginate, paginator.records)
+    rows = db(gquery).select(orderby=Guest.name_sa, limitby=paginator.limitby())
     # records = db(gquery).count()
-    rows = db(gquery).select(
-        orderby=Guest.name_sa, limitby=paginator.limitby()
-    )
+    rows = db(gquery).select(orderby=Guest.name_sa, limitby=paginator.limitby())
     for r in rows:
         for reg in registers:
             if int(r.id) == reg.guesid:
@@ -279,11 +265,7 @@ def show():
                     r.bedroom = "unalloc"
                 else:
                     r.bedroom = None
-                r.age = (
-                    get_age(reg.guesid.birthday)
-                    if reg.guesid.birthday
-                    else None
-                )
+                r.age = get_age(reg.guesid.birthday) if reg.guesid.birthday else None
 
     return dict(
         search=search.process(),

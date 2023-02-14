@@ -594,3 +594,83 @@ faked!
 ALTER TABLE "guest" DROP COLUMN "country__tmp";
 faked!
 success!
+timestamp: 2023-02-14T15:49:08.169111
+ALTER TABLE "guest" ADD "birthday__tmp" DATE NOT NULL;
+faked!
+UPDATE "guest" SET "birthday__tmp"="birthday";
+faked!
+ALTER TABLE "guest" DROP COLUMN "birthday";
+faked!
+ALTER TABLE "guest" ADD "birthday" DATE NOT NULL;
+faked!
+UPDATE "guest" SET "birthday"="birthday__tmp";
+faked!
+ALTER TABLE "guest" DROP COLUMN "birthday__tmp";
+faked!
+timestamp: 2023-02-14T15:49:08.173952
+ALTER TABLE "guest" ADD "city__tmp" VARCHAR(40) NOT NULL;
+faked!
+UPDATE "guest" SET "city__tmp"="city";
+faked!
+ALTER TABLE "guest" DROP COLUMN "city";
+faked!
+ALTER TABLE "guest" ADD "city" VARCHAR(40) NOT NULL;
+faked!
+UPDATE "guest" SET "city"="city__tmp";
+faked!
+ALTER TABLE "guest" DROP COLUMN "city__tmp";
+faked!
+timestamp: 2023-02-14T15:49:08.178848
+ALTER TABLE "guest" ADD "state_prov__tmp" VARCHAR(2) NOT NULL;
+faked!
+UPDATE "guest" SET "state_prov__tmp"="state_prov";
+faked!
+ALTER TABLE "guest" DROP COLUMN "state_prov";
+faked!
+ALTER TABLE "guest" ADD "state_prov" VARCHAR(2) NOT NULL;
+faked!
+UPDATE "guest" SET "state_prov"="state_prov__tmp";
+faked!
+ALTER TABLE "guest" DROP COLUMN "state_prov__tmp";
+faked!
+timestamp: 2023-02-14T15:49:08.183648
+ALTER TABLE "guest" ADD "country__tmp" VARCHAR(30) NOT NULL;
+faked!
+UPDATE "guest" SET "country__tmp"="country";
+faked!
+ALTER TABLE "guest" DROP COLUMN "country";
+faked!
+ALTER TABLE "guest" ADD "country" VARCHAR(30) NOT NULL;
+faked!
+UPDATE "guest" SET "country"="country__tmp";
+faked!
+ALTER TABLE "guest" DROP COLUMN "country__tmp";
+faked!
+success!
+timestamp: 2023-02-14T15:49:08.426095
+ALTER TABLE "guest_stay" ADD "bedroom__tmp" INTEGER;
+faked!
+UPDATE "guest_stay" SET "bedroom__tmp"="bedroom";
+faked!
+ALTER TABLE "guest_stay" DROP COLUMN "bedroom";
+faked!
+ALTER TABLE "guest_stay" ADD "bedroom" INTEGER;
+faked!
+UPDATE "guest_stay" SET "bedroom"="bedroom__tmp";
+faked!
+ALTER TABLE "guest_stay" DROP COLUMN "bedroom__tmp";
+faked!
+timestamp: 2023-02-14T15:49:08.431173
+ALTER TABLE "guest_stay" ADD "bedroom_alt__tmp" INTEGER;
+faked!
+UPDATE "guest_stay" SET "bedroom_alt__tmp"="bedroom_alt";
+faked!
+ALTER TABLE "guest_stay" DROP COLUMN "bedroom_alt";
+faked!
+ALTER TABLE "guest_stay" ADD "bedroom_alt" INTEGER;
+faked!
+UPDATE "guest_stay" SET "bedroom_alt"="bedroom_alt__tmp";
+faked!
+ALTER TABLE "guest_stay" DROP COLUMN "bedroom_alt__tmp";
+faked!
+success!
