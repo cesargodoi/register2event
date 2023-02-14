@@ -5,7 +5,7 @@ myconf = AppConfig(reload=False)
 
 # db connect - set fake_migrate_all=True to reload
 db = DAL(
-    "postgres://postgres:locrio9@192.168.15.7:5432/r2e_db",
+    "postgres://postgres:locrio9@localhost:5432/r2e_db",
     check_reserved=["all"],
     fake_migrate_all=True,
 )
@@ -38,7 +38,9 @@ auth.define_tables(username=False, signature=False)
 
 ## configure email
 mail = auth.settings.mailer
-mail.settings.server = "logging" if request.is_local else myconf.take("smtp.sender")
+mail.settings.server = (
+    "logging" if request.is_local else myconf.take("smtp.sender")
+)
 mail.settings.sender = myconf.take("smtp.sender")
 mail.settings.login = myconf.take("smtp.login")
 
